@@ -1,0 +1,44 @@
+name: News Ingestion
+
+on:
+  schedule:
+    # Run every hour at minute 0
+    - cron: '0 * * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  ingest-news:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        cd ingestor
+        pip install -r requirements.txt
+    
+    - name: Run news ingestor
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        REVALIDATE_URL: ${{ secrets.REVALIDATE_URL }}
+        REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+        X_ENABLED: ${{ secrets.X_ENABLED }}
+        X_BEARER: ${{ secrets.X_BEARER }}
+      run: |
+        cd ingestor
+        python main.py
+    
+    - name: Upload logs
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: ingestor-logs
+        path: ingestor/ingestor.log

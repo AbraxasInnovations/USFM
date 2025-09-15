@@ -1,0 +1,44 @@
+name: Delivery Worker
+
+on:
+  schedule:
+    # Run every 5 minutes
+    - cron: '*/5 * * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  process-deliveries:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        cd ingestor
+        pip install -r requirements.txt
+    
+    - name: Run delivery worker
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        REVALIDATE_URL: ${{ secrets.REVALIDATE_URL }}
+        REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+        X_ENABLED: ${{ secrets.X_ENABLED }}
+        X_BEARER: ${{ secrets.X_BEARER }}
+      run: |
+        cd ingestor
+        python delivery_worker.py
+    
+    - name: Upload logs
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: delivery-worker-logs
+        path: ingestor/delivery_worker.log
