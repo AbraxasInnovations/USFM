@@ -52,16 +52,17 @@ async function getSection(slug: string): Promise<Section | null> {
 }
 
 interface SectionPageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 export default async function SectionPage({ params }: SectionPageProps) {
+  const resolvedParams = await params
   const [posts, sections, section] = await Promise.all([
-    getSectionPosts(params.slug),
+    getSectionPosts(resolvedParams.slug),
     getSections(),
-    getSection(params.slug)
+    getSection(resolvedParams.slug)
   ])
 
   if (!section) {

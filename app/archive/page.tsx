@@ -48,13 +48,14 @@ async function getSections(): Promise<Section[]> {
 }
 
 interface ArchivePageProps {
-  searchParams: {
+  searchParams: Promise<{
     page?: string
-  }
+  }>
 }
 
 export default async function ArchivePage({ searchParams }: ArchivePageProps) {
-  const page = parseInt(searchParams.page || '1', 10)
+  const resolvedSearchParams = await searchParams
+  const page = parseInt(resolvedSearchParams.page || '1', 10)
   const [archiveData, sections] = await Promise.all([
     getArchivePosts(page),
     getSections()

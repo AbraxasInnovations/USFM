@@ -37,14 +37,15 @@ async function getSections(): Promise<Section[]> {
 }
 
 interface TagPageProps {
-  params: {
+  params: Promise<{
     tag: string
-  }
+  }>
 }
 
 export default async function TagPage({ params }: TagPageProps) {
+  const resolvedParams = await params
   const [posts, sections] = await Promise.all([
-    getTagPosts(params.tag),
+    getTagPosts(resolvedParams.tag),
     getSections()
   ])
 
@@ -60,9 +61,9 @@ export default async function TagPage({ params }: TagPageProps) {
       <main className="main">
         <div className="container">
           <div className="section-header">
-            <h1 className="section-page-title">#{params.tag}</h1>
+            <h1 className="section-page-title">#{resolvedParams.tag}</h1>
             <p className="section-description">
-              Latest news tagged with #{params.tag}
+              Latest news tagged with #{resolvedParams.tag}
             </p>
           </div>
 

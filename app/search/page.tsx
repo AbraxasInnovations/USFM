@@ -5,11 +5,11 @@ import PostCard from '@/components/PostCard'
 import Sidebar from '@/components/Sidebar'
 
 interface SearchPageProps {
-  searchParams: {
+  searchParams: Promise<{
     q?: string
     page?: string
     limit?: string
-  }
+  }>
 }
 
 const POSTS_PER_PAGE = 20
@@ -49,9 +49,10 @@ async function getSections(): Promise<Section[]> {
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
-  const query = searchParams.q || ''
-  const currentPage = parseInt(searchParams.page || '1', 10)
-  const limit = parseInt(searchParams.limit || String(POSTS_PER_PAGE), 10)
+  const resolvedSearchParams = await searchParams
+  const query = resolvedSearchParams.q || ''
+  const currentPage = parseInt(resolvedSearchParams.page || '1', 10)
+  const limit = parseInt(resolvedSearchParams.limit || String(POSTS_PER_PAGE), 10)
 
   const { posts, totalCount } = await getSearchPosts(query, currentPage, limit)
   const sections = await getSections()
