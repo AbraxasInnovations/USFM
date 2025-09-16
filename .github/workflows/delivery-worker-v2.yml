@@ -1,5 +1,4 @@
-name: Delivery Worker
-# Updated to remove deprecated actions
+name: Delivery Worker V2
 
 on:
   schedule:
