@@ -23,14 +23,17 @@ export default function Header({ sections }: HeaderProps) {
 
   return (
     <>
-      {/* Initial tall section */}
+      {/* Initial compact section */}
       <section className={`hero-section ${isScrolled ? 'scrolled' : ''}`}>
         <div className="hero-content">
-          <Link href="/" className="hero-logo">
-            <span className="logo-main">US</span>
-            <span className="logo-financial">Financial</span>
-            <span className="logo-moves">Moves</span>
-          </Link>
+          <div className="hero-header">
+            <Link href="/" className="hero-logo">
+              <span className="logo-main">US</span>
+              <span className="logo-financial">Financial</span>
+              <span className="logo-moves">Moves</span>
+            </Link>
+            <p className="hero-tagline">The only free news source for serious moves across finance</p>
+          </div>
           <nav className="hero-nav">
             <ul>
               {sections.map((section) => (

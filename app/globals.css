@@ -10,7 +10,7 @@ body {
     font-weight: 500;
     line-height: 1.6;
     color: #2c2c2c;
-    background-color: #fafafa;
+    background-color: #fefefe;
 }
 
 .container {
@@ -19,60 +19,71 @@ body {
     padding: 0 20px;
 }
 
-/* Hero Section (Initial Tall Header) */
+/* Hero Section (Compact Header) */
 .hero-section {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    min-height: 60vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: linear-gradient(135deg, #fefefe 0%, #ffffff 100%);
+    padding: 2rem 0;
     position: relative;
     transition: all 0.3s ease;
     border-bottom: 1px solid #e8e8e8;
 }
 
 .hero-section.scrolled {
-    min-height: 0;
-    padding: 2rem 0;
+    padding: 1rem 0;
 }
 
 .hero-content {
     text-align: center;
-    max-width: 800px;
+    max-width: 1000px;
+    margin: 0 auto;
     padding: 0 2rem;
+}
+
+.hero-header {
+    margin-bottom: 1.5rem;
 }
 
 .hero-logo {
     text-decoration: none;
-    display: block;
-    margin-bottom: 3rem;
+    display: inline-block;
+    margin-bottom: 0.5rem;
     transition: all 0.3s ease;
 }
 
 .hero-logo .logo-main {
-    font-size: 4rem;
+    font-size: 4.5rem;
     font-weight: 600;
-    color: #2563eb;
-    display: block;
+    color: #00bfff;
+    display: inline;
     line-height: 1;
-    margin-bottom: 0.5rem;
+    margin-right: 0.5rem;
 }
 
 .hero-logo .logo-financial {
-    font-size: 3.5rem;
+    font-size: 4.5rem;
     font-weight: 500;
-    color: #059669;
-    display: block;
+    color: #00bfff;
+    display: inline;
     line-height: 1;
-    margin-bottom: 0.5rem;
+    margin-right: 0.5rem;
 }
 
 .hero-logo .logo-moves {
-    font-size: 3rem;
+    font-size: 4.5rem;
     font-weight: 500;
-    color: #dc2626;
-    display: block;
+    color: #000000;
+    display: inline;
     line-height: 1;
+}
+
+.hero-tagline {
+    font-family: 'Georgia', serif;
+    font-size: 1.1rem;
+    color: #4a5568;
+    font-weight: 400;
+    margin: 0;
+    font-style: italic;
+    letter-spacing: 0.5px;
 }
 
 .hero-nav ul {
@@ -80,7 +91,9 @@ body {
     list-style: none;
     gap: 2.5rem;
     justify-content: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 0 1rem;
 }
 
 .hero-nav a {
@@ -135,19 +148,19 @@ body {
 .compact-logo .logo-main {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #2563eb;
+    color: #00bfff;
 }
 
 .compact-logo .logo-financial {
     font-size: 1.3rem;
     font-weight: 500;
-    color: #059669;
+    color: #00bfff;
 }
 
 .compact-logo .logo-moves {
     font-size: 1.2rem;
     font-weight: 500;
-    color: #dc2626;
+    color: #000000;
 }
 
 .compact-nav ul {
@@ -174,7 +187,7 @@ body {
 /* Main content */
 .main {
     padding: 2rem 0;
-    background-color: #fafafa;
+    background-color: #fefefe;
 }
 
 /* Hero section */
@@ -830,8 +843,7 @@ body {
 /* Responsive design */
 @media (max-width: 768px) {
     .hero-section {
-        min-height: 50vh;
-        padding: 2rem 0;
+        padding: 1.5rem 0;
     }
     
     .hero-logo .logo-main {
@@ -839,20 +851,26 @@ body {
     }
     
     .hero-logo .logo-financial {
-        font-size: 2.5rem;
+        font-size: 3rem;
     }
     
     .hero-logo .logo-moves {
-        font-size: 2rem;
+        font-size: 3rem;
+    }
+    
+    .hero-tagline {
+        font-size: 1rem;
     }
     
     .hero-nav ul {
         gap: 1.5rem;
-        flex-direction: column;
+        flex-wrap: nowrap;
+        justify-content: center;
+        overflow-x: auto;
     }
     
     .hero-nav a {
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
     
     .sticky-header .container {
@@ -1037,8 +1055,7 @@ body {
     
     /* Header Mobile Styles */
     .hero-section {
-        min-height: 40vh;
-        padding: 1.5rem 0;
+        padding: 1rem 0;
     }
     
     .hero-logo .logo-main {
@@ -1046,19 +1063,26 @@ body {
     }
     
     .hero-logo .logo-financial {
-        font-size: 2rem;
+        font-size: 2.5rem;
     }
     
     .hero-logo .logo-moves {
-        font-size: 1.8rem;
+        font-size: 2.5rem;
+    }
+    
+    .hero-tagline {
+        font-size: 0.9rem;
     }
     
     .hero-nav ul {
         gap: 1rem;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        justify-content: flex-start;
     }
     
     .hero-nav a {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         padding: 0.4rem 0.8rem;
     }
     
