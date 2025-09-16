@@ -1,6 +1,6 @@
 requests>=2.31.0
 beautifulsoup4>=4.12.2
 feedparser>=6.0.10
-supabase==2.18.1
-websockets==11.0.3
+supabase>=2.15.1
+httpx>=0.26.0
 python-dotenv>=1.0.0

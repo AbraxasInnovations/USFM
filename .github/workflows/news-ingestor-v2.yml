@@ -34,4 +34,4 @@ jobs:
         X_BEARER: ${{ secrets.X_BEARER }}
       run: |
         cd ingestor
-        python simple_main.py
+        python main.py

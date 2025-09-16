@@ -14,16 +14,7 @@ class DatabaseManager:
         if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
             raise ValueError("Supabase URL and Service Role Key must be provided")
         
-        try:
-            # Try to create client with newer version
-            self.supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-        except TypeError as e:
-            if "proxy" in str(e):
-                # Fallback for older versions that don't support proxy parameter
-                logger.warning("Using fallback Supabase client initialization")
-                self.supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-            else:
-                raise e
+        self.supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
     
     def generate_content_hash(self, source_url: str, title: str) -> str:
         """Generate a content hash for deduplication"""
