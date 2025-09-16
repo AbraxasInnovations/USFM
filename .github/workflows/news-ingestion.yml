@@ -1,4 +1,5 @@
 name: News Ingestion
+# Updated to remove deprecated actions
 
 on:
   schedule:
