@@ -116,9 +116,18 @@ def debug_feed_reading():
         logger.info(f"✅ Feed fetch successful: {len(entries)} entries")
         
         if entries:
-            first_entry = entries[0]
-            logger.info(f"Sample entry title: {first_entry.get('title', 'No title')}")
-            logger.info(f"Sample entry link: {first_entry.get('link', 'No link')}")
+            # Handle feedparser format - entries might be a dict-like object
+            try:
+                first_entry = entries[0]
+            except (KeyError, IndexError):
+                # Try accessing as dict-like object
+                first_entry = list(entries.values())[0] if hasattr(entries, 'values') else None
+            
+            if first_entry:
+                logger.info(f"Sample entry title: {first_entry.get('title', 'No title')}")
+                logger.info(f"Sample entry link: {first_entry.get('link', 'No link')}")
+            else:
+                logger.info("Sample entry: Unable to access first entry")
         
         return True
         

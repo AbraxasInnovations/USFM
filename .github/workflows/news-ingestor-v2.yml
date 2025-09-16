@@ -28,7 +28,7 @@ jobs:
       run: |
         pip list | grep -E "(supabase|httpx|requests|feedparser|beautifulsoup4)"
     
-    - name: Run debug ingestor
+    - name: Run news ingestor
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -38,4 +38,4 @@ jobs:
         X_BEARER: ${{ secrets.X_BEARER }}
       run: |
         cd ingestor
-        python debug_main.py
+        python main.py
