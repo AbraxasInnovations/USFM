@@ -29,7 +29,7 @@ export default function Header({ sections }: HeaderProps) {
           <div className="hero-header">
             <Link href="/" className="hero-logo">
               <span className="logo-main">US</span>
-              <span className="logo-financial">Financial</span>
+              <span className="logo-financial">Finance</span>
               <span className="logo-moves">Moves</span>
             </Link>
             <p className="hero-tagline">The only free news source for serious moves across finance</p>
@@ -59,7 +59,7 @@ export default function Header({ sections }: HeaderProps) {
         <div className="container">
           <Link href="/" className="compact-logo">
             <span className="logo-main">US</span>
-            <span className="logo-financial">Financial</span>
+            <span className="logo-financial">Finance</span>
             <span className="logo-moves">Moves</span>
           </Link>
           <nav className="compact-nav">
@@ -81,6 +81,15 @@ export default function Header({ sections }: HeaderProps) {
           </nav>
         </div>
       </header>
+
+      {/* Carousel Banner */}
+      <div className="carousel-banner">
+        <div className="carousel-content">
+          <span className="carousel-text">
+            Breaking news in finance without breaking open the wallet -- information democratized 💸
+          </span>
+        </div>
+      </div>
     </>
   )
 }

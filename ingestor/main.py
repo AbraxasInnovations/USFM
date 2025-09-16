@@ -196,6 +196,7 @@ class NewsIngestor:
         finally:
             # Clean up resources
             self.feed_reader.close()
+            self.content_processor.close()
 
 def main():
     """Main entry point"""

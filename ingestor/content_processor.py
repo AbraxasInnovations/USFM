@@ -6,12 +6,14 @@ import logging
 from typing import Dict, List, Optional
 from bs4 import BeautifulSoup
 from config import MAX_EXCERPT_WORDS
+from image_search import ImageSearcher
 
 logger = logging.getLogger(__name__)
 
 class ContentProcessor:
     def __init__(self):
         self.max_excerpt_words = MAX_EXCERPT_WORDS
+        self.image_searcher = ImageSearcher()
     
     def clean_text(self, text: str) -> str:
         """Clean and normalize text content"""
@@ -188,8 +190,16 @@ class ContentProcessor:
                 logger.warning(f"No source URL found for item: {title}")
                 return None
             
-            # Get image URL
+            # Get image URL - try RSS first, then search if not available
             image_url = item.get('image_url')
+            
+            if not image_url:
+                # Search for relevant image based on content
+                image_url = self.image_searcher.search_image(title, content)
+                
+                if not image_url:
+                    # Use fallback image based on section
+                    image_url = self.image_searcher.get_fallback_image(section)
             
             # Create post data
             post_data = {
@@ -210,3 +220,8 @@ class ContentProcessor:
         except Exception as e:
             logger.error(f"Error processing feed item: {e}")
             return None
+    
+    def close(self):
+        """Close resources"""
+        if hasattr(self, 'image_searcher'):
+            self.image_searcher.close()

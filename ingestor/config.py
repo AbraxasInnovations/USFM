@@ -19,6 +19,9 @@ REVALIDATE_SECRET = os.getenv('REVALIDATE_SECRET')
 X_ENABLED = os.getenv('X_ENABLED', 'false').lower() == 'true'
 X_BEARER = os.getenv('X_BEARER')
 
+# Image Search Configuration
+UNSPLASH_ACCESS_KEY = os.getenv('UNSPLASH_ACCESS_KEY')
+
 # Content Sources Configuration
 CONTENT_SOURCES = {
     'financial_news': [

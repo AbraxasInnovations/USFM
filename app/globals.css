@@ -82,7 +82,6 @@ body {
     color: #4a5568;
     font-weight: 400;
     margin: 0;
-    font-style: italic;
     letter-spacing: 0.5px;
 }
 
@@ -93,7 +92,8 @@ body {
     justify-content: center;
     flex-wrap: nowrap;
     overflow-x: auto;
-    padding: 0 1rem;
+    padding: 0 2rem;
+    margin: 0;
 }
 
 .hero-nav a {
@@ -182,6 +182,42 @@ body {
 .compact-nav a:hover {
     color: #2563eb;
     background-color: rgba(37, 99, 235, 0.1);
+}
+
+/* Carousel Banner */
+.carousel-banner {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    padding: 0.75rem 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.carousel-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    animation: scroll 20s linear infinite;
+}
+
+.carousel-text {
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+    padding: 0 2rem;
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
 }
 
 /* Main content */
@@ -867,6 +903,7 @@ body {
         flex-wrap: nowrap;
         justify-content: center;
         overflow-x: auto;
+        padding: 0 1rem;
     }
     
     .hero-nav a {
@@ -1079,11 +1116,17 @@ body {
         flex-wrap: nowrap;
         overflow-x: auto;
         justify-content: flex-start;
+        padding: 0 1rem;
     }
     
     .hero-nav a {
         font-size: 0.85rem;
         padding: 0.4rem 0.8rem;
+    }
+    
+    .carousel-text {
+        font-size: 0.8rem;
+        padding: 0 1rem;
     }
     
     .compact-logo .logo-main {
