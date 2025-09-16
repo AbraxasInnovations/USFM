@@ -9,8 +9,8 @@ body {
     font-family: 'Oswald', sans-serif;
     font-weight: 500;
     line-height: 1.6;
-    color: #333;
-    background-color: #ffffff;
+    color: #2c2c2c;
+    background-color: #fafafa;
 }
 
 .container {
@@ -19,49 +19,162 @@ body {
     padding: 0 20px;
 }
 
-/* Header */
-.header {
-    background-color: #ffffff;
-    border-bottom: 2px solid #e5e5e5;
-    padding: 1rem 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+/* Hero Section (Initial Tall Header) */
+.hero-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #e8e8e8;
 }
 
-.header .container {
+.hero-section.scrolled {
+    min-height: 0;
+    padding: 2rem 0;
+}
+
+.hero-content {
+    text-align: center;
+    max-width: 800px;
+    padding: 0 2rem;
+}
+
+.hero-logo {
+    text-decoration: none;
+    display: block;
+    margin-bottom: 3rem;
+    transition: all 0.3s ease;
+}
+
+.hero-logo .logo-main {
+    font-size: 4rem;
+    font-weight: 600;
+    color: #2563eb;
+    display: block;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.hero-logo .logo-financial {
+    font-size: 3.5rem;
+    font-weight: 500;
+    color: #059669;
+    display: block;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.hero-logo .logo-moves {
+    font-size: 3rem;
+    font-weight: 500;
+    color: #dc2626;
+    display: block;
+    line-height: 1;
+}
+
+.hero-nav ul {
+    display: flex;
+    list-style: none;
+    gap: 2.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.hero-nav a {
+    text-decoration: none;
+    color: #4a5568;
+    font-weight: 500;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+}
+
+.hero-nav a:hover {
+    color: #2563eb;
+    background-color: rgba(37, 99, 235, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Sticky Header (Compact) */
+.sticky-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(250, 250, 250, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #e8e8e8;
+    padding: 1rem 0;
+    z-index: 1000;
+    transform: translateY(-100%);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.sticky-header.visible {
+    transform: translateY(0);
+}
+
+.sticky-header .container {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.logo {
-    font-size: 2rem;
-    font-weight: 500;
-    color: #1a1a1a;
+.compact-logo {
     text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.nav ul {
+.compact-logo .logo-main {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2563eb;
+}
+
+.compact-logo .logo-financial {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: #059669;
+}
+
+.compact-logo .logo-moves {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #dc2626;
+}
+
+.compact-nav ul {
     display: flex;
     list-style: none;
-    gap: 2rem;
+    gap: 1.5rem;
 }
 
-.nav a {
+.compact-nav a {
     text-decoration: none;
-    color: #666;
+    color: #4a5568;
     font-weight: 500;
+    font-size: 0.9rem;
     transition: color 0.3s ease;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
 }
 
-.nav a:hover {
-    color: #1a1a1a;
+.compact-nav a:hover {
+    color: #2563eb;
+    background-color: rgba(37, 99, 235, 0.1);
 }
 
 /* Main content */
 .main {
     padding: 2rem 0;
+    background-color: #fafafa;
 }
 
 /* Hero section */
@@ -117,10 +230,10 @@ body {
 /* Featured Article */
 .featured-article {
     background: #ffffff;
-    border: 1px solid #e5e5e5;
+    border: 1px solid #e8e8e8;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     height: 90%;
 }
 
@@ -147,13 +260,14 @@ body {
 }
 
 .featured-meta .category {
-    background-color: #1a1a1a;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     color: #ffffff;
     padding: 0.5rem 1rem;
     font-size: 0.8rem;
     font-weight: 500;
     text-transform: uppercase;
     border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
 }
 
 .featured-meta .date {
@@ -248,10 +362,10 @@ body {
 /* Top Headlines */
 .top-headlines {
     background: #ffffff;
-    border: 1px solid #e5e5e5;
+    border: 1px solid #e8e8e8;
     border-radius: 12px;
     padding: 2rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     height: 90%;
     display: flex;
     flex-direction: column;
@@ -284,7 +398,7 @@ body {
 }
 
 .headline-number {
-    background-color: #1a1a1a;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     color: #ffffff;
     width: 32px;
     height: 32px;
@@ -295,6 +409,7 @@ body {
     font-weight: 500;
     font-size: 0.9rem;
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
 }
 
 .headline-content {
@@ -356,14 +471,16 @@ body {
 
 .article-card {
     background: #ffffff;
-    border: 1px solid #e5e5e5;
+    border: 1px solid #e8e8e8;
     border-radius: 8px;
     overflow: hidden;
-    transition: box-shadow 0.3s ease;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .article-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
 }
 
 .article-image {
@@ -712,13 +829,41 @@ body {
 
 /* Responsive design */
 @media (max-width: 768px) {
-    .header .container {
+    .hero-section {
+        min-height: 50vh;
+        padding: 2rem 0;
+    }
+    
+    .hero-logo .logo-main {
+        font-size: 3rem;
+    }
+    
+    .hero-logo .logo-financial {
+        font-size: 2.5rem;
+    }
+    
+    .hero-logo .logo-moves {
+        font-size: 2rem;
+    }
+    
+    .hero-nav ul {
+        gap: 1.5rem;
+        flex-direction: column;
+    }
+    
+    .hero-nav a {
+        font-size: 1rem;
+    }
+    
+    .sticky-header .container {
         flex-direction: column;
         gap: 1rem;
     }
     
-    .nav ul {
+    .compact-nav ul {
         gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
     }
     
     .hero h2 {
@@ -888,6 +1033,50 @@ body {
     .section-posts-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
+    }
+    
+    /* Header Mobile Styles */
+    .hero-section {
+        min-height: 40vh;
+        padding: 1.5rem 0;
+    }
+    
+    .hero-logo .logo-main {
+        font-size: 2.5rem;
+    }
+    
+    .hero-logo .logo-financial {
+        font-size: 2rem;
+    }
+    
+    .hero-logo .logo-moves {
+        font-size: 1.8rem;
+    }
+    
+    .hero-nav ul {
+        gap: 1rem;
+    }
+    
+    .hero-nav a {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .compact-logo .logo-main {
+        font-size: 1.2rem;
+    }
+    
+    .compact-logo .logo-financial {
+        font-size: 1rem;
+    }
+    
+    .compact-logo .logo-moves {
+        font-size: 0.9rem;
+    }
+    
+    .compact-nav a {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.6rem;
     }
     
 /* Pagination Mobile */
