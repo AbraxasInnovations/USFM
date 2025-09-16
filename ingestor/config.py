@@ -32,26 +32,26 @@ CONTENT_SOURCES = {
             'tags': ['markets', 'finance']
         },
         {
-            'name': 'MarketWatch - Business',
-            'url': 'https://feeds.marketwatch.com/marketwatch/business/',
+            'name': 'Bloomberg Markets',
+            'url': 'https://feeds.bloomberg.com/markets/news.rss',
             'section': 'cap',
-            'tags': ['business', 'finance']
+            'tags': ['markets', 'finance', 'bloomberg']
         }
     ],
     'mergers_acquisitions': [
         {
-            'name': 'MarketWatch - M&A News',
-            'url': 'https://feeds.marketwatch.com/marketwatch/topstories/',
+            'name': 'MarketWatch - Business',
+            'url': 'https://feeds.marketwatch.com/marketwatch/business/',
             'section': 'ma',
-            'tags': ['mergers', 'acquisitions', 'ma']
+            'tags': ['mergers', 'acquisitions', 'ma', 'business']
         }
     ],
     'regulatory': [
         {
-            'name': 'MarketWatch - Regulatory',
+            'name': 'MarketWatch - Top Stories',
             'url': 'https://feeds.marketwatch.com/marketwatch/topstories/',
             'section': 'reg',
-            'tags': ['antitrust', 'regulatory', 'doj']
+            'tags': ['antitrust', 'regulatory', 'doj', 'sec']
         }
     ]
 }
