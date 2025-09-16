@@ -1,5 +1,6 @@
 import { Post } from '@/lib/supabase'
 import TagChip from './TagChip'
+import PostImage from './PostImage'
 
 interface FeaturedArticleProps {
   post: Post
@@ -17,9 +18,12 @@ export default function FeaturedArticle({ post }: FeaturedArticleProps) {
   return (
     <article className="featured-article">
       <div className="featured-image">
-        <div className="placeholder-image">
-          📈
-        </div>
+        <PostImage 
+          imageUrl={post.image_url} 
+          title={post.title}
+          sectionSlug={post.section_slug}
+          className="featured-image-content"
+        />
       </div>
       
       <div className="featured-content">

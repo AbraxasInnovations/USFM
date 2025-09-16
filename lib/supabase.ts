@@ -20,6 +20,7 @@ export interface Post {
   content_hash: string
   status: 'published' | 'hidden'
   origin_type: 'SEC' | 'USGOV' | 'PRESS' | 'MEDIA' | 'RUMOR'
+  image_url: string | null
 }
 
 export interface Section {

@@ -66,7 +66,8 @@ class FeedReader:
                     'published': entry.get('published', ''),
                     'published_parsed': entry.get('published_parsed'),
                     'author': entry.get('author', ''),
-                    'tags': [tag.get('term', '') for tag in entry.get('tags', [])]
+                    'tags': [tag.get('term', '') for tag in entry.get('tags', [])],
+                    'image_url': self._extract_image_url(entry)
                 }
                 
                 entries.append(entry_data)
@@ -76,6 +77,57 @@ class FeedReader:
                 continue
         
         return entries
+    
+    def _extract_image_url(self, entry) -> Optional[str]:
+        """Extract image URL from RSS entry"""
+        try:
+            # Try different common image fields in RSS feeds
+            image_fields = [
+                'media_content',  # Media RSS
+                'media_thumbnail',  # Media RSS thumbnail
+                'enclosures',  # Standard RSS enclosures
+                'image',  # Some feeds use this
+                'thumbnail'  # Some feeds use this
+            ]
+            
+            # Check media_content (Media RSS)
+            if hasattr(entry, 'media_content') and entry.media_content:
+                for media in entry.media_content:
+                    if media.get('type', '').startswith('image/'):
+                        return media.get('url')
+            
+            # Check media_thumbnail (Media RSS)
+            if hasattr(entry, 'media_thumbnail') and entry.media_thumbnail:
+                return entry.media_thumbnail[0].get('url')
+            
+            # Check enclosures (standard RSS)
+            if hasattr(entry, 'enclosures') and entry.enclosures:
+                for enclosure in entry.enclosures:
+                    if enclosure.get('type', '').startswith('image/'):
+                        return enclosure.get('href')
+            
+            # Check for image field
+            if hasattr(entry, 'image') and entry.image:
+                return entry.image
+            
+            # Check for thumbnail field
+            if hasattr(entry, 'thumbnail') and entry.thumbnail:
+                return entry.thumbnail
+            
+            # Try to extract from description HTML (fallback)
+            description = entry.get('description', '') or entry.get('summary', '')
+            if description:
+                import re
+                # Look for img tags
+                img_match = re.search(r'<img[^>]+src=["\']([^"\']+)["\']', description, re.IGNORECASE)
+                if img_match:
+                    return img_match.group(1)
+            
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error extracting image URL: {e}")
+            return None
     
     def fetch_all_feeds(self, sources: List[Dict]) -> List[Dict]:
         """Fetch all configured feeds"""

@@ -1,4 +1,5 @@
 import { Post, Section } from '@/lib/supabase'
+import PostImage from './PostImage'
 
 interface SectionNewsGridProps {
   posts: Post[]
@@ -23,9 +24,12 @@ export default function SectionNewsGrid({ posts, sections }: SectionNewsGridProp
             {sectionPosts.map((post) => (
               <article key={post.id} className="article-card">
                 <div className="article-image">
-                  <div className="placeholder-image">
-                    📊
-                  </div>
+                  <PostImage 
+                    imageUrl={post.image_url} 
+                    title={post.title}
+                    sectionSlug={post.section_slug}
+                    className="article-image-content"
+                  />
                 </div>
                 <div className="article-content">
                   <h3 className="article-title">

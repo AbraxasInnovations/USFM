@@ -188,6 +188,9 @@ class ContentProcessor:
                 logger.warning(f"No source URL found for item: {title}")
                 return None
             
+            # Get image URL
+            image_url = item.get('image_url')
+            
             # Create post data
             post_data = {
                 'title': title,
@@ -198,7 +201,8 @@ class ContentProcessor:
                 'section_slug': section,
                 'tags': tags,
                 'status': 'published',
-                'origin_type': 'RSS'
+                'origin_type': 'RSS',
+                'image_url': image_url
             }
             
             return post_data
