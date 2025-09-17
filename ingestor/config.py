@@ -22,6 +22,9 @@ X_BEARER = os.getenv('X_BEARER')
 # Image Search Configuration
 UNSPLASH_ACCESS_KEY = os.getenv('UNSPLASH_ACCESS_KEY')
 
+# AI Content Rewriting Configuration
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
 # Content Sources Configuration
 CONTENT_SOURCES = {
     'financial_news': [

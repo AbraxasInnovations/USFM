@@ -19,8 +19,10 @@ export interface Post {
   tags: string[]
   content_hash: string
   status: 'published' | 'hidden'
-  origin_type: 'SEC' | 'USGOV' | 'PRESS' | 'MEDIA' | 'RUMOR'
+  origin_type: 'SEC' | 'USGOV' | 'PRESS' | 'MEDIA' | 'RUMOR' | 'SCRAPED'
   image_url: string | null
+  scraped_content: string | null
+  article_slug: string | null
 }
 
 export interface Section {

@@ -4,6 +4,7 @@ import Header from '@/components/Header'
 import FeaturedArticle from '@/components/FeaturedArticle'
 import TopHeadlines from '@/components/TopHeadlines'
 import SectionNewsGrid from '@/components/SectionNewsGrid'
+import ScrapedArticlesSection from '@/components/ScrapedArticlesSection'
 import Sidebar from '@/components/Sidebar'
 
 // This function runs on the server
@@ -67,6 +68,9 @@ export default async function HomePage() {
 
           {/* Section News Grid */}
           <SectionNewsGrid posts={posts} sections={sections} />
+
+          {/* Scraped Articles Section */}
+          <ScrapedArticlesSection posts={posts} />
 
           {/* Additional Content Grid */}
           <section className="additional-content">
