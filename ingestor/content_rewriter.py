@@ -5,14 +5,22 @@ import openai
 import logging
 from typing import Optional, Dict
 import re
+import os
+from dotenv import load_dotenv
 from config import OPENAI_API_KEY
+
+# Load environment variables
+load_dotenv('../.env.local')
 
 logger = logging.getLogger(__name__)
 
 class ContentRewriter:
     def __init__(self):
-        if OPENAI_API_KEY:
-            openai.api_key = OPENAI_API_KEY
+        # Try to get API key from environment or config
+        api_key = os.getenv('OPENAI_API_KEY') or OPENAI_API_KEY
+        if api_key:
+            openai.api_key = api_key
+            logger.info("OpenAI API key loaded successfully")
         else:
             logger.warning("OPENAI_API_KEY not set. Content rewriting will be disabled.")
     
@@ -21,7 +29,9 @@ class ContentRewriter:
         Rewrite an article using AI while maintaining factual accuracy
         Returns dict with rewritten title and content
         """
-        if not OPENAI_API_KEY:
+        # Check if API key is available
+        api_key = os.getenv('OPENAI_API_KEY') or OPENAI_API_KEY
+        if not api_key:
             logger.warning("OpenAI API key not available. Skipping content rewriting.")
             return None
         
@@ -82,7 +92,7 @@ class ContentRewriter:
             Rewritten headline:
             """
             
-            response = openai.ChatCompletion.create(
+            response = openai.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=100,
@@ -123,7 +133,7 @@ class ContentRewriter:
             Rewritten article:
             """
             
-            response = openai.ChatCompletion.create(
+            response = openai.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=1000,
@@ -148,7 +158,7 @@ class ContentRewriter:
             Summary:
             """
             
-            response = openai.ChatCompletion.create(
+            response = openai.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=150,
