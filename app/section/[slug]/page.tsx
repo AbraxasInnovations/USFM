@@ -49,7 +49,7 @@ async function getSectionPosts(slug: string): Promise<Post[]> {
     console.error('Error fetching smart content:', error)
     
     // Fallback to direct query
-    const { data, error } = await supabase
+    const { data: fallbackData, error: fallbackError } = await supabase
       .from('posts')
       .select('*')
       .eq('status', 'published')
@@ -57,12 +57,12 @@ async function getSectionPosts(slug: string): Promise<Post[]> {
       .order('created_at', { ascending: false })
       .limit(20)
 
-    if (error) {
-      console.error('Error fetching posts:', error)
+    if (fallbackError) {
+      console.error('Error fetching posts:', fallbackError)
       return []
     }
 
-    return data || []
+    return fallbackData || []
   }
 }
 
