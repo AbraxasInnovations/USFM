@@ -82,21 +82,28 @@ export async function GET(request: NextRequest) {
         // }
         
         // Get fallback posts (older than 2 hours, newer than 7 days)
-        const fallbackPosts = newPosts.filter(post => {
+        let fallbackPosts = newPosts.filter(post => {
           const postDate = new Date(post.created_at)
           const isInRange = postDate <= cutoffTime && postDate >= fallbackCutoff
-          
-          // Debug logging for REG section (can be removed in production)
-          // if (sectionSlug === 'reg' && post.scraped_content) {
-          //   console.log(`REG scraped post: ${post.title}`)
-          //   console.log(`  Post date: ${postDate.toISOString()}`)
-          //   console.log(`  Cutoff: ${cutoffTime.toISOString()}`)
-          //   console.log(`  Fallback cutoff: ${fallbackCutoff.toISOString()}`)
-          //   console.log(`  Is in range: ${isInRange}`)
-          // }
-          
           return isInRange
         })
+        
+        // If we don't have enough fallback posts within 7 days, extend to 30 days
+        if (fallbackPosts.length < needed) {
+          const extendedCutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // 30 days ago
+          fallbackPosts = newPosts.filter(post => {
+            const postDate = new Date(post.created_at)
+            return postDate <= cutoffTime && postDate >= extendedCutoff
+          })
+        }
+        
+        // If still not enough, use any posts older than 2 hours (no lower limit)
+        if (fallbackPosts.length < needed) {
+          fallbackPosts = newPosts.filter(post => {
+            const postDate = new Date(post.created_at)
+            return postDate <= cutoffTime
+          })
+        }
         
         // Debug logging for REG section (can be removed in production)
         // if (sectionSlug === 'reg') {
@@ -129,12 +136,58 @@ export async function GET(request: NextRequest) {
         const combinedPosts = [...recentPosts, ...fallbackPosts.slice(0, needed)]
         smartContent[sectionSlug] = combinedPosts.slice(0, threshold)
         
+        // Debug logging for sections with low content
+        if (smartContent[sectionSlug].length < threshold) {
+          console.log(`⚠️ Section ${sectionSlug}: Only ${smartContent[sectionSlug].length}/${threshold} posts available`)
+          console.log(`  Recent: ${recentPosts.length}, Fallback: ${fallbackPosts.length}, Total in section: ${newPosts.length}`)
+        }
+        
         // Debug logging for REG section (can be removed in production)
         // if (sectionSlug === 'reg') {
         //   console.log(`REG final result: ${smartContent[sectionSlug].length} posts`)
         //   const finalScraped = smartContent[sectionSlug].filter(p => p.scraped_content)
         //   console.log(`REG final scraped: ${finalScraped.length}`)
         // }
+      }
+    }
+
+    // Final safety net: if any section is still empty, try to populate with related content
+    for (const section of sections || []) {
+      const sectionSlug = section.slug
+      const threshold = sectionThresholds[sectionSlug as keyof typeof sectionThresholds] || 3
+      
+      if (!smartContent[sectionSlug] || smartContent[sectionSlug].length === 0) {
+        console.log(`🚨 Section ${sectionSlug} is completely empty, attempting emergency fallback`)
+        
+        // Try to find related content from other sections
+        let emergencyPosts: any[] = []
+        
+        // For LBO/PE, try M&A content
+        if (sectionSlug === 'lbo') {
+          emergencyPosts = (smartContent['ma'] || []).filter(post => 
+            post.title.toLowerCase().includes('private') || 
+            post.title.toLowerCase().includes('equity') ||
+            post.title.toLowerCase().includes('buyout')
+          )
+        }
+        
+        // For regulatory, try M&A content with regulatory keywords
+        if (sectionSlug === 'reg') {
+          emergencyPosts = (smartContent['ma'] || []).filter(post => 
+            post.title.toLowerCase().includes('approval') || 
+            post.title.toLowerCase().includes('regulatory') ||
+            post.title.toLowerCase().includes('antitrust')
+          )
+        }
+        
+        // If still no emergency posts, use any recent content from other sections
+        if (emergencyPosts.length === 0) {
+          const allOtherPosts = Object.values(smartContent).flat().filter(post => post)
+          emergencyPosts = allOtherPosts.slice(0, threshold)
+        }
+        
+        smartContent[sectionSlug] = emergencyPosts.slice(0, threshold)
+        console.log(`🚨 Emergency fallback for ${sectionSlug}: ${smartContent[sectionSlug].length} posts`)
       }
     }
 
