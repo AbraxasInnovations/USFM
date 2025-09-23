@@ -111,6 +111,11 @@ class SECContentProcessor:
             # Generate slug
             article_slug = self._generate_slug(rewritten_data['title'])
             
+            # Generate consistent content hash (same as database manager)
+            content_hash = hashlib.sha256(
+                f"{filing_content['url']}{rewritten_data['title']}".lower().strip().encode('utf-8')
+            ).hexdigest()
+            
             # Prepare post data
             post_data = {
                 'title': rewritten_data['title'],
@@ -120,9 +125,7 @@ class SECContentProcessor:
                 'source_url': filing_content['url'],
                 'section_slug': section_slug,
                 'tags': tags,
-                'content_hash': hashlib.sha256(
-                    f"{filing_content['url']}_{rewritten_data['title']}".encode('utf-8')
-                ).hexdigest(),
+                'content_hash': content_hash,
                 'status': 'published',
                 'origin_type': 'SCRAPED',
                 'image_url': self._get_sec_image_url(),  # Use custom SEC images

@@ -28,17 +28,17 @@ export async function GET(request: NextRequest) {
 
     // Smart content management logic
     const sectionThresholds = {
-      'ma': 3,
-      'lbo': 3,
-      'reg': 3,
-      'cap': 5,
+      'ma': 2,
+      'lbo': 2,
+      'reg': 2,
+      'cap': 3,
       'rumor': 2,
-      'all': 30
+      'all': 20
     }
 
-    const fallbackRetentionDays = 7
+    const fallbackRetentionDays = 14
     const cutoffTime = new Date(Date.now() - 2 * 60 * 60 * 1000) // 2 hours ago
-    const fallbackCutoff = new Date(Date.now() - fallbackRetentionDays * 24 * 60 * 60 * 1000) // 7 days ago
+    const fallbackCutoff = new Date(Date.now() - fallbackRetentionDays * 24 * 60 * 60 * 1000) // 14 days ago
     
     // Debug logging (can be removed in production)
     // console.log('Smart Content API Debug:')
@@ -63,91 +63,40 @@ export async function GET(request: NextRequest) {
       const threshold = sectionThresholds[sectionSlug as keyof typeof sectionThresholds] || 3
       const newPosts = postsBySection[sectionSlug] || []
       
-      // Filter for recent posts (last 2 hours)
-      const recentPosts = newPosts.filter(post => 
+      // Sort all posts by priority: scraped content first, then by created_at desc
+      const sortedPosts = [...newPosts].sort((a, b) => {
+        // Prioritize scraped content
+        if (a.scraped_content && !b.scraped_content) return -1
+        if (!a.scraped_content && b.scraped_content) return 1
+        
+        // If both are scraped or both are not scraped, sort by date
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      })
+      
+      // Filter for recent posts (last 2 hours) from sorted list
+      const recentPosts = sortedPosts.filter(post => 
         new Date(post.created_at) > cutoffTime
       )
       
       if (recentPosts.length >= threshold) {
         // Use recent posts if we have enough
         smartContent[sectionSlug] = recentPosts.slice(0, threshold)
+        console.log(`✅ Section ${sectionSlug}: Using ${recentPosts.length} recent posts`)
       } else {
-        // Need fallback posts
-        const needed = threshold - recentPosts.length
+        // Not enough recent posts - use the best available posts (maintaining existing content)
+        const needed = threshold
+        const availablePosts = sortedPosts.slice(0, needed)
         
-        // Debug logging for REG section (can be removed in production)
-        // if (sectionSlug === 'reg') {
-        //   console.log(`REG section: ${recentPosts.length} recent, need ${needed} fallback`)
-        //   console.log(`REG total posts: ${newPosts.length}`)
-        // }
-        
-        // Get fallback posts (older than 2 hours, newer than 7 days)
-        let fallbackPosts = newPosts.filter(post => {
-          const postDate = new Date(post.created_at)
-          const isInRange = postDate <= cutoffTime && postDate >= fallbackCutoff
-          return isInRange
-        })
-        
-        // If we don't have enough fallback posts within 7 days, extend to 30 days
-        if (fallbackPosts.length < needed) {
-          const extendedCutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // 30 days ago
-          fallbackPosts = newPosts.filter(post => {
-            const postDate = new Date(post.created_at)
-            return postDate <= cutoffTime && postDate >= extendedCutoff
-          })
+        // If we still don't have enough, extend the time window
+        if (availablePosts.length < needed) {
+          // Get all posts from the section, sorted by priority
+          const allSectionPosts = sortedPosts
+          smartContent[sectionSlug] = allSectionPosts.slice(0, needed)
+        } else {
+          smartContent[sectionSlug] = availablePosts
         }
         
-        // If still not enough, use any posts older than 2 hours (no lower limit)
-        if (fallbackPosts.length < needed) {
-          fallbackPosts = newPosts.filter(post => {
-            const postDate = new Date(post.created_at)
-            return postDate <= cutoffTime
-          })
-        }
-        
-        // Debug logging for REG section (can be removed in production)
-        // if (sectionSlug === 'reg') {
-        //   console.log(`REG fallback posts after filter: ${fallbackPosts.length}`)
-        //   const scrapedFallback = fallbackPosts.filter(p => p.scraped_content)
-        //   console.log(`REG scraped fallback posts: ${scrapedFallback.length}`)
-        // }
-        
-        // Sort fallback posts: scraped content first, then by created_at desc
-        fallbackPosts.sort((a, b) => {
-          // Prioritize scraped content
-          if (a.scraped_content && !b.scraped_content) return -1
-          if (!a.scraped_content && b.scraped_content) return 1
-          
-          // If both are scraped or both are not scraped, sort by date
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        })
-        
-        // Debug logging for REG section (can be removed in production)
-        // if (sectionSlug === 'reg') {
-        //   console.log(`REG after sorting: ${fallbackPosts.length} fallback posts`)
-        //   const scrapedAfterSort = fallbackPosts.filter(p => p.scraped_content)
-        //   console.log(`REG scraped after sort: ${scrapedAfterSort.length}`)
-        //   if (scrapedAfterSort.length > 0) {
-        //     console.log(`REG scraped post position: ${fallbackPosts.findIndex(p => p.scraped_content)}`)
-        //   }
-        // }
-        
-        // Combine recent and fallback posts
-        const combinedPosts = [...recentPosts, ...fallbackPosts.slice(0, needed)]
-        smartContent[sectionSlug] = combinedPosts.slice(0, threshold)
-        
-        // Debug logging for sections with low content
-        if (smartContent[sectionSlug].length < threshold) {
-          console.log(`⚠️ Section ${sectionSlug}: Only ${smartContent[sectionSlug].length}/${threshold} posts available`)
-          console.log(`  Recent: ${recentPosts.length}, Fallback: ${fallbackPosts.length}, Total in section: ${newPosts.length}`)
-        }
-        
-        // Debug logging for REG section (can be removed in production)
-        // if (sectionSlug === 'reg') {
-        //   console.log(`REG final result: ${smartContent[sectionSlug].length} posts`)
-        //   const finalScraped = smartContent[sectionSlug].filter(p => p.scraped_content)
-        //   console.log(`REG final scraped: ${finalScraped.length}`)
-        // }
+        console.log(`📋 Section ${sectionSlug}: Using ${smartContent[sectionSlug].length}/${threshold} posts (${recentPosts.length} recent)`)
       }
     }
 
@@ -177,6 +126,19 @@ export async function GET(request: NextRequest) {
             post.title.toLowerCase().includes('approval') || 
             post.title.toLowerCase().includes('regulatory') ||
             post.title.toLowerCase().includes('antitrust')
+          )
+        }
+        
+        // For crypto/rumors, try any content with crypto keywords
+        if (sectionSlug === 'rumor') {
+          emergencyPosts = Object.values(smartContent).flat().filter(post => 
+            post && (
+              post.title.toLowerCase().includes('crypto') ||
+              post.title.toLowerCase().includes('bitcoin') ||
+              post.title.toLowerCase().includes('blockchain') ||
+              post.title.toLowerCase().includes('altcoin') ||
+              post.tags?.some(tag => ['crypto', 'bitcoin', 'blockchain', 'altcoin'].includes(tag.toLowerCase()))
+            )
           )
         }
         

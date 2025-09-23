@@ -54,7 +54,7 @@ CONTENT_SOURCES = {
             'url': 'https://www.ft.com/rss/home',
             'section': 'cap',
             'tags': ['finance', 'business', 'markets']
-        }
+        },
     ],
     'mergers_acquisitions': [
         {
