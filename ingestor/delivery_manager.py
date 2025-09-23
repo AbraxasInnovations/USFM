@@ -28,7 +28,11 @@ class DeliveryManager:
         }
     
     def create_x_delivery(self, post_data: Dict) -> Dict:
-        """Create an X/Twitter delivery"""
+        """Create an X/Twitter delivery (FREE TIER - very selective)"""
+        # Only tweet high-priority content due to free tier limits
+        if not self._should_tweet_post(post_data):
+            return None
+            
         # Format the post for X/Twitter
         title = post_data['title']
         summary = post_data.get('summary', '')
@@ -85,14 +89,40 @@ class DeliveryManager:
             'payload': web_payload
         })
         
-        # X delivery (if enabled or for future use)
+        # X delivery (if enabled and post qualifies)
         x_payload = self.create_x_delivery(post_data)
-        deliveries.append({
-            'channel': 'x',
-            'payload': x_payload
-        })
+        if x_payload:  # Only add if post qualifies for tweeting
+            deliveries.append({
+                'channel': 'x',
+                'payload': x_payload
+            })
         
         return deliveries
+    
+    def _should_tweet_post(self, post_data: Dict) -> bool:
+        """Determine if a post should be tweeted (FREE TIER - very selective)"""
+        if not self.x_enabled:
+            return False
+            
+        title = post_data.get('title', '').lower()
+        section = post_data.get('section_slug', '').lower()
+        origin_type = post_data.get('origin_type', '').upper()
+        
+        # Only tweet high-priority content:
+        # 1. SEC filings (S-4, mergers, acquisitions)
+        if origin_type == 'SEC' and any(keyword in title for keyword in ['merger', 'acquisition', 's-4', 'filing']):
+            return True
+            
+        # 2. Major M&A deals
+        if section in ['merger', 'acquisition'] and any(keyword in title for keyword in ['billion', 'million', 'major', 'strategic']):
+            return True
+            
+        # 3. Regulatory news
+        if section in ['regulatory', 'antitrust'] and any(keyword in title for keyword in ['doj', 'ftc', 'sec', 'regulatory']):
+            return True
+            
+        # Skip everything else to conserve free tier limits
+        return False
     
     def send_web_revalidation(self, paths: List[str]) -> bool:
         """Send web revalidation request"""

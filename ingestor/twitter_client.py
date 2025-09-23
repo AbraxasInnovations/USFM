@@ -26,41 +26,54 @@ class TwitterClient:
             resource_owner_secret=access_token_secret
         )
         
-        # Rate limiting tracking
+        # Rate limiting tracking for FREE TIER
         self.rate_limits = {
             'tweets': {
-                'limit': 300,  # Free tier: 300 tweets per 15 minutes
-                'remaining': 300,
-                'reset_time': datetime.now() + timedelta(minutes=15)
+                'limit': 1500,  # Free tier: 1,500 tweets per month
+                'remaining': 1500,
+                'reset_time': datetime.now() + timedelta(days=30)
             }
         }
         
-        # Posting schedule (to stay within limits)
-        self.posts_per_hour = 10  # Conservative limit for free tier
+        # Posting schedule (to stay within FREE TIER limits)
+        self.posts_per_hour = 1  # Very conservative: 1 tweet per hour max
+        self.posts_per_day = 2   # Maximum 2 tweets per day
         self.last_post_time = None
         self.posts_this_hour = 0
+        self.posts_today = 0
         self.hour_start = datetime.now()
+        self.day_start = datetime.now()
     
     def check_rate_limits(self) -> bool:
-        """Check if we can post without hitting rate limits"""
+        """Check if we can post without hitting rate limits (FREE TIER)"""
         now = datetime.now()
+        
+        # Reset daily counter if new day
+        if now.date() != self.day_start.date():
+            self.posts_today = 0
+            self.day_start = now
         
         # Reset hourly counter if new hour
         if now.hour != self.hour_start.hour:
             self.posts_this_hour = 0
             self.hour_start = now
         
+        # Check daily limit (most restrictive for free tier)
+        if self.posts_today >= self.posts_per_day:
+            logger.warning(f"Daily limit reached ({self.posts_per_day} posts/day) - FREE TIER LIMIT")
+            return False
+        
         # Check hourly limit
         if self.posts_this_hour >= self.posts_per_hour:
             logger.warning(f"Hourly limit reached ({self.posts_per_hour} posts/hour)")
             return False
         
-        # Check 15-minute rate limit
+        # Check monthly rate limit
         if self.rate_limits['tweets']['remaining'] <= 0:
             reset_time = self.rate_limits['tweets']['reset_time']
             if now < reset_time:
                 wait_time = (reset_time - now).total_seconds()
-                logger.warning(f"Rate limit reached. Reset in {wait_time:.0f} seconds")
+                logger.warning(f"Monthly rate limit reached. Reset in {wait_time:.0f} seconds")
                 return False
         
         return True
@@ -101,9 +114,10 @@ class TwitterClient:
             if response.status_code == 201:
                 tweet_data = response.json()
                 self.posts_this_hour += 1
+                self.posts_today += 1
                 self.last_post_time = datetime.now()
                 
-                logger.info(f"Successfully posted tweet: {tweet_data.get('data', {}).get('id')}")
+                logger.info(f"Successfully posted tweet: {tweet_data.get('data', {}).get('id')} (Daily: {self.posts_today}/{self.posts_per_day})")
                 return tweet_data
             
             elif response.status_code == 429:
