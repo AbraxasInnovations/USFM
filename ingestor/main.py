@@ -264,6 +264,7 @@ class NewsIngestor:
         
         finally:
             # Clean up resources
+            self.db.close()
             self.feed_reader.close()
             self.content_processor.close()
             self.scraped_processor.close()

@@ -118,3 +118,9 @@ class DatabaseManager:
         except Exception as e:
             logger.error(f"Error cleaning up old posts: {e}")
             return 0
+    
+    def close(self):
+        """Close database connections (Supabase client doesn't need explicit closing)"""
+        # Supabase client doesn't require explicit closing
+        # This method exists for consistency with other classes
+        pass
