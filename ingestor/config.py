@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv('../.env.local')
 
 # Supabase Configuration
-SUPABASE_URL = os.getenv('NEXT_PUBLIC_SUPABASE_URL')
+SUPABASE_URL = os.getenv('SUPABASE_URL') or os.getenv('NEXT_PUBLIC_SUPABASE_URL')
 SUPABASE_SERVICE_ROLE_KEY = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
 
 # Revalidation Configuration
