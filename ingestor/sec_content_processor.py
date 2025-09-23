@@ -7,6 +7,7 @@ from typing import Dict, List, Optional
 from datetime import datetime
 import re
 import hashlib
+import random
 
 from sec_scraper import SECScraper
 from article_rewriter import ArticleRewriter
@@ -124,7 +125,7 @@ class SECContentProcessor:
                 ).hexdigest(),
                 'status': 'published',
                 'origin_type': 'SCRAPED',
-                'image_url': None,  # SEC filings don't have images
+                'image_url': self._get_sec_image_url(),  # Use custom SEC images
                 'scraped_content': rewritten_data['content'],
                 'article_slug': article_slug,
                 'company_name': original_filing.get('company_name', ''),
@@ -150,6 +151,17 @@ class SECContentProcessor:
         slug = f"sec-{slug}"
         return slug
 
+    def _get_sec_image_url(self) -> str:
+        """Get a random SEC image URL from our custom images"""
+        # Available SEC images
+        sec_images = ['sec1.jpg', 'sec2.jpg', 'sec3.jpg', 'sec4.jpg']
+        
+        # Randomly select one
+        selected_image = random.choice(sec_images)
+        
+        # Return the full URL path
+        return f"/images/sec/{selected_image}"
+    
     def close(self):
         """Close resources"""
         if hasattr(self.sec_scraper, 'session'):
