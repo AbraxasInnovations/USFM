@@ -185,8 +185,12 @@ class ContentProcessor:
             # Generate summary
             summary = self.generate_summary(title, content)
             
-            # Classify section
-            section = self.classify_section(title, content, source_config.get('tags', []))
+            # Use RSS feed's intended section first, then classify if not specified
+            intended_section = source_config.get('section')
+            if intended_section:
+                section = intended_section
+            else:
+                section = self.classify_section(title, content, source_config.get('tags', []))
             
             # Extract tags
             tags = self.extract_tags(title, content, source_config.get('tags', []))
