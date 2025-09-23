@@ -14,6 +14,9 @@ from database import DatabaseManager
 from feed_reader import FeedReader
 from content_processor import ContentProcessor
 from delivery_manager import DeliveryManager
+from scraped_content_processor import ScrapedContentProcessor
+from sec_content_processor import SECContentProcessor
+from smart_content_manager import SmartContentManager
 
 # Configure logging
 logging.basicConfig(
@@ -33,6 +36,9 @@ class NewsIngestor:
         self.feed_reader = FeedReader()
         self.content_processor = ContentProcessor()
         self.delivery_manager = DeliveryManager()
+        self.scraped_processor = ScrapedContentProcessor()
+        self.sec_processor = SECContentProcessor()
+        self.smart_content_manager = SmartContentManager()
         
         # Statistics
         self.stats = {
@@ -40,6 +46,9 @@ class NewsIngestor:
             'entries_fetched': 0,
             'posts_created': 0,
             'posts_skipped': 0,
+            'scraped_articles': 0,
+            'sec_filings': 0,
+            'fallback_articles_used': 0,
             'errors': 0
         }
     
@@ -130,6 +139,41 @@ class NewsIngestor:
         logger.info(f"Successfully stored {len(stored_posts)} posts")
         return stored_posts
     
+    def process_content_with_smart_fallback(self, all_posts: List[Dict]) -> Dict[str, List[Dict]]:
+        """
+        Process all posts and organize them by section with smart fallback logic
+        """
+        try:
+            # Group posts by section
+            posts_by_section = {}
+            for post in all_posts:
+                section = post.get('section_slug', 'cap')
+                if section not in posts_by_section:
+                    posts_by_section[section] = []
+                posts_by_section[section].append(post)
+            
+            # Apply smart content management to each section
+            smart_content = {}
+            for section_slug, posts in posts_by_section.items():
+                smart_posts = self.smart_content_manager.get_smart_content_for_section(section_slug, posts)
+                smart_content[section_slug] = smart_posts
+                
+                # Count fallback articles used
+                if len(smart_posts) > len(posts):
+                    self.stats['fallback_articles_used'] += len(smart_posts) - len(posts)
+            
+            # Handle homepage content
+            all_posts_for_homepage = [post for posts in smart_content.values() for post in posts]
+            smart_content['homepage'] = self.smart_content_manager.get_smart_homepage_content(all_posts_for_homepage)
+            
+            logger.info(f"Smart content distribution: {[(section, len(posts)) for section, posts in smart_content.items()]}")
+            return smart_content
+            
+        except Exception as e:
+            logger.error(f"Error processing content with smart fallback: {e}")
+            # Fallback to original logic
+            return {'homepage': all_posts[:30]}
+    
     def cleanup_old_data(self):
         """Clean up old data to manage storage"""
         logger.info("Cleaning up old data...")
@@ -149,6 +193,9 @@ class NewsIngestor:
         logger.info(f"Entries fetched: {self.stats['entries_fetched']}")
         logger.info(f"Posts created: {self.stats['posts_created']}")
         logger.info(f"Posts skipped: {self.stats['posts_skipped']}")
+        logger.info(f"Scraped articles: {self.stats['scraped_articles']}")
+        logger.info(f"SEC S-4 filings: {self.stats['sec_filings']}")
+        logger.info(f"Fallback articles used: {self.stats['fallback_articles_used']}")
         logger.info(f"Errors: {self.stats['errors']}")
         
         # Get recent posts count
@@ -175,6 +222,28 @@ class NewsIngestor:
                 logger.warning("No posts created from entries")
                 return
             
+            # Process scraped content (WealthSpire)
+            logger.info("Processing scraped content from WealthSpire...")
+            scraped_posts = self.scraped_processor.process_wealthspire_articles(max_articles=2)
+            
+            if scraped_posts:
+                logger.info(f"Successfully processed {len(scraped_posts)} scraped articles")
+                posts.extend(scraped_posts)
+                self.stats['scraped_articles'] = len(scraped_posts)
+            else:
+                logger.warning("No scraped articles processed")
+            
+            # Process SEC S-4 filings
+            logger.info("Processing SEC S-4 filings...")
+            sec_posts = self.sec_processor.process_s4_filings(max_filings=2) # Process 2 S-4 filings
+            
+            if sec_posts:
+                logger.info(f"Successfully processed {len(sec_posts)} SEC S-4 filings")
+                posts.extend(sec_posts) # Add SEC posts to the main list
+                self.stats['sec_filings'] = len(sec_posts)
+            else:
+                logger.warning("No SEC S-4 filings processed")
+            
             # Store posts in database
             stored_posts = self.store_posts(posts)
             
@@ -197,6 +266,9 @@ class NewsIngestor:
             # Clean up resources
             self.feed_reader.close()
             self.content_processor.close()
+            self.scraped_processor.close()
+            self.sec_processor.close()
+            self.smart_content_manager.close()
 
 def main():
     """Main entry point"""

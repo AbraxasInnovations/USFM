@@ -4,16 +4,29 @@ import PostImage from './PostImage'
 interface SectionNewsGridProps {
   posts: Post[]
   sections: Section[]
+  smartContent?: any
 }
 
-export default function SectionNewsGrid({ posts, sections }: SectionNewsGridProps) {
-  // Filter out 'all' section and get posts for each section
+export default function SectionNewsGrid({ posts, sections, smartContent }: SectionNewsGridProps) {
+  // Use smart content if available, otherwise fallback to regular filtering
   const sectionPosts = sections
     .filter(section => section.slug !== 'all')
-    .map(section => ({
-      section,
-      posts: posts.filter(post => post.section_slug === section.slug).slice(0, 3)
-    }))
+    .map(section => {
+      let sectionPosts = []
+      
+      if (smartContent && smartContent[section.slug]) {
+        // Use smart content for this section
+        sectionPosts = smartContent[section.slug].slice(0, 3)
+      } else {
+        // Fallback to regular filtering
+        sectionPosts = posts.filter(post => post.section_slug === section.slug).slice(0, 3)
+      }
+      
+      return {
+        section,
+        posts: sectionPosts
+      }
+    })
 
   return (
     <div className="section-news-grid">
@@ -21,7 +34,7 @@ export default function SectionNewsGrid({ posts, sections }: SectionNewsGridProp
         <div key={section.slug} className="section-row">
           <h2 className="section-title">{section.name}</h2>
           <div className="articles-grid">
-            {sectionPosts.map((post) => (
+            {sectionPosts.map((post: Post) => (
               <article key={post.id} className="article-card">
                 <div className="article-image">
                   <PostImage 
@@ -34,9 +47,9 @@ export default function SectionNewsGrid({ posts, sections }: SectionNewsGridProp
                 <div className="article-content">
                   <h3 className="article-title">
                     <a 
-                      href={post.source_url} 
-                      target="_blank" 
-                      rel="noopener nofollow ugc"
+                      href={post.article_slug ? `/article/${post.article_slug}` : post.source_url} 
+                      target={post.article_slug ? "_self" : "_blank"} 
+                      rel={post.article_slug ? "" : "noopener nofollow ugc"}
                     >
                       {post.title}
                     </a>

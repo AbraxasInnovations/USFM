@@ -229,6 +229,102 @@ body {
     background-color: #fefefe;
 }
 
+/* Desktop Layout with Ads */
+.desktop-layout {
+    display: grid;
+    grid-template-columns: 1fr 1200px 1fr; /* Equal whitespace on sides, fixed content width */
+    max-width: 100vw;
+    margin: 0 auto;
+    gap: 0;
+    padding: 0;
+}
+
+.main-content {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Ad Containers - Desktop Only */
+.ad-container {
+    width: 100%;
+    max-width: 300px; /* Wider ad containers to use more whitespace */
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 2rem 1rem 0 1rem;
+    margin: 0 auto;
+}
+
+.ad-left {
+    justify-self: end; /* Push left ad to the right side of its grid area */
+    padding-right: 2rem;
+}
+
+.ad-right {
+    justify-self: start; /* Push right ad to the left side of its grid area */
+    padding-left: 2rem;
+}
+
+.ad-slot {
+    width: 100%;
+    max-width: 300px; /* Wider ad slots to use available whitespace */
+    min-width: 300px; /* Ensure minimum width for AdSense */
+    min-height: 1000px; /* Increased height for taller ads */
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    top: 2rem; /* Sticky positioning for better visibility */
+}
+
+.ad-slot ins {
+    width: 100%;
+    height: 100%;
+    min-height: 1000px;
+}
+
+/* Ad placeholder styling */
+.ad-slot:empty::before {
+    content: "Advertisement";
+    color: #6c757d;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 1000px;
+    background-color: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+}
+
+/* Hide ads on mobile and tablet */
+@media (max-width: 1024px) {
+    .desktop-layout {
+        display: block;
+        grid-template-columns: none;
+        max-width: 1200px;
+        padding: 0;
+    }
+    
+    .ad-container {
+        display: none;
+    }
+    
+    .main-content {
+        width: 100%;
+        max-width: 1200px;
+    }
+}
+
 /* Hero section */
 .hero {
     background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
@@ -497,6 +593,12 @@ body {
 /* Section News Grid */
 .section-news-grid {
     margin-top: 3rem;
+}
+
+@media (max-width: 768px) {
+    .section-news-grid {
+        margin-top: 2rem; /* Reduce top margin on mobile */
+    }
 }
 
 .section-row {
@@ -930,6 +1032,7 @@ body {
     .morning-brew-layout {
         grid-template-columns: 1fr;
         gap: 2rem;
+        max-height: none; /* Remove height constraint on mobile */
     }
     
     .featured-title {
@@ -998,6 +1101,10 @@ body {
     .container {
         padding: 0 15px;
     }
+    
+    .main {
+        padding: 1.5rem 0; /* Reduce main padding on mobile */
+    }
 }
 
 @media (max-width: 480px) {
@@ -1055,6 +1162,10 @@ body {
     }
     
     /* Section News Grid Mobile */
+    .section-row {
+        margin-bottom: 3rem; /* Reduce spacing on mobile */
+    }
+    
     .articles-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
@@ -1062,6 +1173,7 @@ body {
     
     .section-title {
         font-size: 1.5rem;
+        margin-bottom: 1.5rem; /* Reduce title margin on mobile */
     }
     
     .article-image {
@@ -1075,6 +1187,11 @@ body {
     
     .article-title {
         font-size: 1rem;
+        line-height: 1.4; /* Better line height for mobile */
+    }
+    
+    .article-card {
+        margin-bottom: 0; /* Ensure no extra margin on mobile */
     }
     
     /* Section Page Mobile */
@@ -1161,65 +1278,96 @@ body {
 
 /* Search Form */
 .search-form {
-    margin: 2rem 0;
-    padding: 2rem;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e5e5e5;
+    margin: 3rem auto;
+    padding: 3rem 2rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 16px;
+    border: 3px solid #ff0000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    text-align: center;
 }
 
 .search-input-group {
     display: flex;
     gap: 1rem;
-    max-width: 600px;
+    max-width: 700px;
+    margin: 0 auto;
+    align-items: center;
 }
 
 .search-input {
     flex: 1;
-    padding: 0.75rem 1rem;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 1rem;
+    padding: 1.25rem 1.5rem;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    font-size: 1.125rem;
     font-family: inherit;
+    transition: all 0.3s ease;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .search-input:focus {
     outline: none;
     border-color: #1a1a1a;
-    box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.1);
+    box-shadow: 0 0 0 4px rgba(26, 26, 26, 0.1), 0 4px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.search-input::placeholder {
+    color: #6c757d;
+    font-weight: 400;
 }
 
 .search-button {
-    background-color: #1a1a1a;
+    background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
     color: white;
-    padding: 0.75rem 1.5rem;
+    padding: 1.25rem 2rem;
     border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 500;
+    border-radius: 12px;
+    font-size: 1.125rem;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(26, 26, 26, 0.2);
+    min-width: 140px;
 }
 
 .search-button:hover {
-    background-color: #333;
-    transform: translateY(-1px);
+    background: linear-gradient(135deg, #333 0%, #1a1a1a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(26, 26, 26, 0.3);
+}
+
+.search-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(26, 26, 26, 0.2);
 }}
 
 /* Search Form Mobile */
 @media (max-width: 768px) {
     .search-form {
-        margin: 1rem 0;
-        padding: 1rem;
+        margin: 2rem 1rem;
+        padding: 2rem 1.5rem;
+        max-width: none;
     }
     
     .search-input-group {
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 1rem;
+        max-width: none;
+    }
+    
+    .search-input {
+        padding: 1rem 1.25rem;
+        font-size: 1rem;
     }
     
     .search-button {
         width: 100%;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
     }
 }
 
@@ -1324,6 +1472,111 @@ body {
 
 .scraped-article-link:hover {
     color: #1d4ed8;
+}
+
+/* Related Posts Section */
+.related-posts {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.related-posts h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+}
+
+.related-post-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    height: 100%;
+}
+
+.related-post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.related-post-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.related-post-meta {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.related-post-title {
+    margin-bottom: 0.75rem;
+}
+
+.related-post-title a {
+    color: #1f2937;
+    text-decoration: none;
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.4;
+    transition: color 0.2s ease;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.related-post-title a:hover {
+    color: #2563eb;
+}
+
+.related-post-footer {
+    margin-top: auto;
+}
+
+/* Article Content Improvements */
+.article-content p {
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+}
+
+.article-content h2 {
+    font-size: 1.875rem;
+    font-weight: bold;
+    color: #1f2937;
+    margin: 2rem 0 1rem 0;
+}
+
+.article-content h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 1.5rem 0 0.75rem 0;
+}
+
+.article-content ul, .article-content ol {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+.article-content li {
+    margin-bottom: 0.5rem;
+    line-height: 1.7;
+}
+
+.article-content strong {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.article-content em {
+    font-style: italic;
+    color: #4b5563;
 }
 
 /* Scraped Articles Responsive */

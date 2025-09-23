@@ -9,8 +9,18 @@ const oswald = Oswald({
 })
 
 export const metadata: Metadata = {
-  title: 'US Financial Moves',
+  title: 'US Finance Moves',
   description: 'US Finance Deal Feed - M&A, LBO, take-privates, antitrust, major financings',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
 }
 
 export default function RootLayout({
@@ -20,6 +30,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        {/* Google AdSense */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+          crossOrigin="anonymous"
+        ></script>
+      </head>
       <body className={oswald.className}>
         {children}
       </body>

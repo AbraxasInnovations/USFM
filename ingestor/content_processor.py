@@ -119,6 +119,11 @@ class ContentProcessor:
         if any(keyword in text for keyword in reg_keywords):
             return 'reg'
         
+        # Crypto/Altcoin keywords
+        crypto_keywords = ['crypto', 'cryptocurrency', 'bitcoin', 'ethereum', 'altcoin', 'blockchain', 'defi', 'nft', 'token', 'digital asset']
+        if any(keyword in text for keyword in crypto_keywords):
+            return 'rumor'
+        
         # Capital markets keywords
         cap_keywords = ['ipo', 'public offering', 'stock', 'equity', 'debt', 'bond', 'securities', 'trading']
         if any(keyword in text for keyword in cap_keywords):
@@ -146,7 +151,11 @@ class ContentProcessor:
             'merger': ['merger', 'merge', 'consolidation'],
             'ipo': ['ipo', 'public offering', 'going public'],
             'antitrust': ['antitrust', 'competition', 'monopoly'],
-            'regulatory': ['regulatory', 'regulation', 'compliance']
+            'regulatory': ['regulatory', 'regulation', 'compliance'],
+            'crypto': ['crypto', 'cryptocurrency', 'bitcoin', 'ethereum', 'altcoin', 'blockchain'],
+            'defi': ['defi', 'decentralized finance', 'yield farming', 'liquidity'],
+            'nft': ['nft', 'non-fungible token', 'digital collectible'],
+            'trading': ['trading', 'exchange', 'market', 'price', 'pump', 'rally']
         }
         
         for tag, keywords in tag_keywords.items():
@@ -201,6 +210,15 @@ class ContentProcessor:
                     # Use fallback image based on section
                     image_url = self.image_searcher.get_fallback_image(section)
             
+            # Determine origin type based on source
+            origin_type = 'RSS'
+            if 'cointelegraph' in source_name.lower() or 'crypto' in source_name.lower() or 'altcoin' in source_name.lower():
+                origin_type = 'CRYPTO'
+            elif 'sec' in source_name.lower() or 'edgar' in source_name.lower():
+                origin_type = 'SEC'
+            elif 'doj' in source_name.lower() or 'ftc' in source_name.lower():
+                origin_type = 'USGOV'
+            
             # Create post data
             post_data = {
                 'title': title,
@@ -211,7 +229,7 @@ class ContentProcessor:
                 'section_slug': section,
                 'tags': tags,
                 'status': 'published',
-                'origin_type': 'RSS',
+                'origin_type': origin_type,
                 'image_url': image_url
             }
             

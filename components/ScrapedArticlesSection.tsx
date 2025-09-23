@@ -24,9 +24,9 @@ export default function ScrapedArticlesSection({ posts }: ScrapedArticlesSection
   return (
     <section className="scraped-articles-section">
       <div className="section-header">
-        <h2 className="section-title">📰 Rewritten Articles</h2>
+        <h2 className="section-title">📰 Written Articles</h2>
         <p className="section-description">
-          In-depth articles scraped and rewritten for better readability
+          In-house articles for detailed analysis of US financial moves
         </p>
       </div>
       

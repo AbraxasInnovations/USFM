@@ -5,10 +5,10 @@ import os
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+load_dotenv('../.env.local')
 
 # Supabase Configuration
-SUPABASE_URL = os.getenv('SUPABASE_URL')
+SUPABASE_URL = os.getenv('NEXT_PUBLIC_SUPABASE_URL')
 SUPABASE_SERVICE_ROLE_KEY = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
 
 # Revalidation Configuration
@@ -17,7 +17,10 @@ REVALIDATE_SECRET = os.getenv('REVALIDATE_SECRET')
 
 # Social Media Configuration (for future use)
 X_ENABLED = os.getenv('X_ENABLED', 'false').lower() == 'true'
-X_BEARER = os.getenv('X_BEARER')
+X_API_KEY = os.getenv('X_API_KEY')
+X_API_SECRET = os.getenv('X_API_SECRET')
+X_ACCESS_TOKEN = os.getenv('X_ACCESS_TOKEN')
+X_ACCESS_TOKEN_SECRET = os.getenv('X_ACCESS_TOKEN_SECRET')
 
 # Image Search Configuration
 UNSPLASH_ACCESS_KEY = os.getenv('UNSPLASH_ACCESS_KEY')
@@ -55,6 +58,14 @@ CONTENT_SOURCES = {
             'url': 'https://feeds.marketwatch.com/marketwatch/topstories/',
             'section': 'reg',
             'tags': ['antitrust', 'regulatory', 'doj', 'sec']
+        }
+    ],
+    'altcoin_news': [
+        {
+            'name': 'Cointelegraph - Altcoin News',
+            'url': 'https://cointelegraph.com/rss/tag/altcoin',
+            'section': 'rumor',
+            'tags': ['crypto', 'altcoin', 'blockchain', 'digital-assets']
         }
     ]
 }

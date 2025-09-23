@@ -310,3 +310,61 @@ Transform the static finance news site into a comprehensive US Finance Deal Feed
 - Read the file before you try to edit it
 - If there are vulnerabilities that appear in the terminal, run npm audit before proceeding
 - Always ask before using the -force git command
+- **Websockets Issue Fixed:** Supabase Python client requires `websockets==14.2` for `websockets.asyncio` import to work. Version 11.0.3 was causing `ModuleNotFoundError: No module named 'websockets.asyncio'`
+- **Environment Variables:** Python ingestor uses `NEXT_PUBLIC_SUPABASE_URL` (not `SUPABASE_URL`) to match the Next.js environment variable naming
+
+### SEC S-4 Filing Content Extraction Issues & Solutions
+
+**Problem:** AI was producing vague, generic articles about SEC S-4 filings instead of extracting specific company names and transaction details (e.g., "Norwood acquiring PB Bankshares").
+
+**Root Cause Analysis:**
+1. **SEC Blocking:** Initial attempts to access SEC filing documents were blocked (403 status) due to incorrect User-Agent headers
+2. **Limited Content Extraction:** Even when accessing content, our extraction method was only getting the first 2000 characters (registration header) and missing the actual merger details
+3. **Generic Fallback Content:** When blocked, the system fell back to generic content that didn't contain specific company names
+
+**Solution Implemented:**
+1. **Fixed User-Agent Header:** Changed from browser-like User-Agent to SEC-compliant `'US Financial Moves (contact@usfinancemoves.com)'` which allows proper access to SEC documents
+2. **Enhanced Content Extraction:** Increased content extraction from 2000 to 20,000 characters to capture the full merger details and transaction information
+3. **Improved AI Prompting:** Enhanced the AI rewriter prompt to be more specific about extracting company names, financial terms, and transaction details
+
+**Technical Implementation:**
+- **File:** `ingestor/sec_scraper.py` - Updated User-Agent and content extraction logic
+- **File:** `ingestor/article_rewriter.py` - Enhanced AI prompting for better detail extraction
+- **Integration:** SEC processing runs automatically every hour via GitHub Actions in `main.py` lines 236-245
+
+**Results:**
+- ✅ Successfully extracts specific company names (e.g., "First Community Corporation acquiring Signature Bank of Georgia")
+- ✅ Includes exact financial details ($32.4 million valuation, $18.68 per share)
+- ✅ Provides specific dates and transaction terms
+- ✅ Creates comprehensive, informative articles instead of generic content
+
+**Key Learning:** SEC requires proper User-Agent identification and provides rich, detailed content when accessed correctly. The issue was never with the AI capabilities, but with the content being fed to it.
+
+### Altcoin News Integration
+
+**Feature Added:** Integrated Cointelegraph altcoin RSS feed for crypto/blockchain news coverage.
+
+**Implementation Details:**
+1. **RSS Feed Source:** `https://cointelegraph.com/rss/tag/altcoin` - Provides 30+ recent altcoin news articles
+2. **Section Classification:** Altcoin news automatically classified to 'rumor' section (Rumors/Watchlist)
+3. **Origin Type:** New 'CRYPTO' origin type added to distinguish crypto content from other sources
+4. **Image Support:** Cointelegraph RSS includes high-quality images for each article
+5. **Tag System:** Enhanced with crypto-specific tags: 'crypto', 'defi', 'nft', 'trading', 'altcoin', 'blockchain'
+
+**Technical Changes:**
+- **File:** `ingestor/config.py` - Added altcoin_news content source
+- **File:** `lib/supabase.ts` - Added 'CRYPTO' to origin_type union
+- **File:** `ingestor/content_processor.py` - Enhanced section classification and tag extraction for crypto content
+- **Integration:** Automatically processed every hour via existing GitHub Actions workflow
+
+**Content Flow:**
+- Cointelegraph RSS → Content Processor → 'rumor' section → Homepage + Section pages
+- Images automatically extracted from RSS feed
+- Crypto-specific tags applied for better categorization
+- Articles appear in Rumors/Watchlist section alongside other speculative/emerging market content
+
+**User Experience:**
+- Altcoin news appears in the "Rumors/Watchlist" section navigation
+- Articles include crypto-specific tags for filtering
+- High-quality images from Cointelegraph enhance visual appeal
+- Content automatically refreshed every hour with latest crypto market developments

@@ -4,7 +4,8 @@ Delivery management for fan-out processing
 import requests
 import logging
 from typing import Dict, List
-from config import REVALIDATE_URL, REVALIDATE_SECRET, X_ENABLED, X_BEARER
+from config import REVALIDATE_URL, REVALIDATE_SECRET, X_ENABLED, X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET
+from twitter_client import TwitterClient
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,11 @@ class DeliveryManager:
         self.revalidate_url = REVALIDATE_URL
         self.revalidate_secret = REVALIDATE_SECRET
         self.x_enabled = X_ENABLED
-        self.x_bearer = X_BEARER
+        
+        # Initialize Twitter client if enabled
+        self.twitter_client = None
+        if self.x_enabled and X_API_KEY and X_API_SECRET and X_ACCESS_TOKEN and X_ACCESS_TOKEN_SECRET:
+            self.twitter_client = TwitterClient(X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET)
     
     def create_web_delivery(self, post_data: Dict) -> Dict:
         """Create a web revalidation delivery"""
@@ -26,17 +31,43 @@ class DeliveryManager:
         """Create an X/Twitter delivery"""
         # Format the post for X/Twitter
         title = post_data['title']
-        summary = post_data['summary']
+        summary = post_data.get('summary', '')
         url = post_data['source_url']
+        section = post_data.get('section_slug', '').upper()
+        
+        # Create hashtags based on section and tags
+        hashtags = []
+        if section:
+            hashtags.append(f"#{section}")
+        
+        # Add relevant hashtags based on content
+        if 'merger' in title.lower() or 'acquisition' in title.lower():
+            hashtags.append('#M&A')
+        if 'crypto' in title.lower() or 'bitcoin' in title.lower():
+            hashtags.append('#Crypto')
+        if 'sec' in title.lower() or 'filing' in title.lower():
+            hashtags.append('#SEC')
         
         # Create the tweet text (X has a 280 character limit)
-        tweet_text = f"{title}"
-        if summary and len(summary) < 100:
-            tweet_text += f" — {summary}"
+        tweet_text = f"📈 {title}"
+        
+        # Add summary if it fits
+        if summary and len(summary) < 80:
+            tweet_text += f"\n\n{summary}"
+        
+        # Add hashtags
+        if hashtags:
+            hashtag_text = " ".join(hashtags[:3])  # Limit to 3 hashtags
+            if len(tweet_text) + len(hashtag_text) + 25 < 280:  # Leave room for URL
+                tweet_text += f"\n\n{hashtag_text}"
         
         # Add URL (shortened URLs are typically 23 characters)
         if len(tweet_text) + 25 < 280:  # Leave room for URL and spaces
-            tweet_text += f" {url}"
+            tweet_text += f"\n\n{url}"
+        
+        # Ensure we don't exceed character limit
+        if len(tweet_text) > 280:
+            tweet_text = tweet_text[:277] + "..."
         
         return {
             'text': tweet_text,
@@ -93,15 +124,23 @@ class DeliveryManager:
             return False
     
     def send_x_post(self, text: str) -> bool:
-        """Send X/Twitter post (placeholder for future implementation)"""
+        """Send X/Twitter post"""
         if not self.x_enabled:
             logger.info("X posting is disabled")
             return False
         
-        if not self.x_bearer:
-            logger.warning("X bearer token not configured")
+        if not self.twitter_client:
+            logger.warning("Twitter client not initialized")
             return False
         
-        # TODO: Implement X API posting
-        logger.info(f"Would post to X: {text}")
-        return False
+        try:
+            result = self.twitter_client.create_tweet(text)
+            if result:
+                logger.info("Successfully posted to X/Twitter")
+                return True
+            else:
+                logger.warning("Failed to post to X/Twitter (likely rate limited)")
+                return False
+        except Exception as e:
+            logger.error(f"Error posting to X/Twitter: {e}")
+            return False

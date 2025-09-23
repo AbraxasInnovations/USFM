@@ -80,17 +80,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           </div>
 
           {/* Search Form */}
-          <div className="search-form">
+          <div className="search-form" style={{margin: '3rem auto', padding: '3rem 2rem', background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)', borderRadius: '16px', border: '1px solid #e5e5e5', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)', maxWidth: '800px', textAlign: 'center'}}>
             <form method="GET" action="/search">
-              <div className="search-input-group">
+              <div className="search-input-group" style={{display: 'flex', gap: '1rem', maxWidth: '700px', margin: '0 auto', alignItems: 'center'}}>
                 <input
                   type="text"
                   name="q"
                   placeholder="Search for deals, companies, or topics..."
                   defaultValue={query}
                   className="search-input"
+                  style={{flex: '1', padding: '1.25rem 1.5rem', border: '2px solid #ddd', borderRadius: '12px', fontSize: '1.125rem', fontFamily: 'inherit', transition: 'all 0.3s ease', backgroundColor: 'white', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'}}
                 />
-                <button type="submit" className="search-button">
+                <button type="submit" className="search-button" style={{background: 'linear-gradient(135deg, #1a1a1a 0%, #333 100%)', color: 'white', padding: '1.25rem 2rem', border: 'none', borderRadius: '12px', fontSize: '1.125rem', fontWeight: '600', cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: '0 4px 16px rgba(26, 26, 26, 0.2)', minWidth: '140px'}}>
                   Search
                 </button>
               </div>

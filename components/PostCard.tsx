@@ -21,9 +21,9 @@ export default function PostCard({ post }: PostCardProps) {
         <span className="category">{post.section_slug.toUpperCase()}</span>
         <h3>
           <a 
-            href={post.source_url} 
-            target="_blank" 
-            rel="noopener nofollow ugc"
+            href={post.article_slug ? `/article/${post.article_slug}` : post.source_url} 
+            target={post.article_slug ? "_self" : "_blank"} 
+            rel={post.article_slug ? "" : "noopener nofollow ugc"}
             style={{ color: 'inherit', textDecoration: 'none' }}
           >
             {post.title}
