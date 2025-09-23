@@ -28,11 +28,11 @@ export async function GET(request: NextRequest) {
 
     // Smart content management logic
     const sectionThresholds = {
-      'ma': 2,
-      'lbo': 2,
-      'reg': 2,
+      'ma': 3,
+      'lbo': 3,
+      'reg': 3,
       'cap': 3,
-      'rumor': 2,
+      'rumor': 3,
       'all': 20
     }
 
@@ -83,16 +83,15 @@ export async function GET(request: NextRequest) {
         smartContent[sectionSlug] = recentPosts.slice(0, threshold)
         console.log(`✅ Section ${sectionSlug}: Using ${recentPosts.length} recent posts`)
       } else {
-        // Not enough recent posts - use the best available posts (maintaining existing content)
+        // Not enough recent posts - use the best available posts to fill to threshold
         const needed = threshold
         const availablePosts = sortedPosts.slice(0, needed)
         
-        // If we still don't have enough, extend the time window
-        if (availablePosts.length < needed) {
-          // Get all posts from the section, sorted by priority
-          const allSectionPosts = sortedPosts
-          smartContent[sectionSlug] = allSectionPosts.slice(0, needed)
+        // Always ensure we have exactly the threshold number of posts
+        if (availablePosts.length >= needed) {
+          smartContent[sectionSlug] = availablePosts
         } else {
+          // If we don't have enough posts in this section, use what we have
           smartContent[sectionSlug] = availablePosts
         }
         
@@ -105,8 +104,10 @@ export async function GET(request: NextRequest) {
       const sectionSlug = section.slug
       const threshold = sectionThresholds[sectionSlug as keyof typeof sectionThresholds] || 3
       
-      if (!smartContent[sectionSlug] || smartContent[sectionSlug].length === 0) {
-        console.log(`🚨 Section ${sectionSlug} is completely empty, attempting emergency fallback`)
+      if (!smartContent[sectionSlug] || smartContent[sectionSlug].length < threshold) {
+        const currentCount = smartContent[sectionSlug]?.length || 0
+        const needed = threshold - currentCount
+        console.log(`🚨 Section ${sectionSlug}: Only ${currentCount}/${threshold} posts, need ${needed} more`)
         
         // Try to find related content from other sections
         let emergencyPosts: any[] = []
@@ -145,11 +146,14 @@ export async function GET(request: NextRequest) {
         // If still no emergency posts, use any recent content from other sections
         if (emergencyPosts.length === 0) {
           const allOtherPosts = Object.values(smartContent).flat().filter(post => post)
-          emergencyPosts = allOtherPosts.slice(0, threshold)
+          emergencyPosts = allOtherPosts
         }
         
-        smartContent[sectionSlug] = emergencyPosts.slice(0, threshold)
-        console.log(`🚨 Emergency fallback for ${sectionSlug}: ${smartContent[sectionSlug].length} posts`)
+        // Add emergency posts to existing content
+        const existingPosts = smartContent[sectionSlug] || []
+        const additionalPosts = emergencyPosts.slice(0, needed)
+        smartContent[sectionSlug] = [...existingPosts, ...additionalPosts].slice(0, threshold)
+        console.log(`🚨 Emergency fallback for ${sectionSlug}: Added ${additionalPosts.length} posts, total: ${smartContent[sectionSlug].length}`)
       }
     }
 
