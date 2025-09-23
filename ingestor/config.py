@@ -42,6 +42,18 @@ CONTENT_SOURCES = {
             'url': 'https://feeds.bloomberg.com/markets/news.rss',
             'section': 'cap',
             'tags': ['markets', 'finance', 'bloomberg']
+        },
+        {
+            'name': 'Reuters Business',
+            'url': 'https://feeds.reuters.com/reuters/businessNews',
+            'section': 'cap',
+            'tags': ['business', 'finance', 'markets']
+        },
+        {
+            'name': 'Financial Times',
+            'url': 'https://www.ft.com/rss/home',
+            'section': 'cap',
+            'tags': ['finance', 'business', 'markets']
         }
     ],
     'mergers_acquisitions': [
@@ -58,6 +70,38 @@ CONTENT_SOURCES = {
             'url': 'https://feeds.marketwatch.com/marketwatch/topstories/',
             'section': 'reg',
             'tags': ['antitrust', 'regulatory', 'doj', 'sec']
+        },
+        {
+            'name': 'Bloomberg Politics',
+            'url': 'https://feeds.bloomberg.com/politics/news.rss',
+            'section': 'reg',
+            'tags': ['regulatory', 'government', 'policy']
+        },
+        {
+            'name': 'Reuters Business',
+            'url': 'https://feeds.reuters.com/reuters/businessNews',
+            'section': 'reg',
+            'tags': ['business', 'regulatory', 'antitrust']
+        }
+    ],
+    'lbo_pe': [
+        {
+            'name': 'PE Hub',
+            'url': 'https://www.pehub.com/feed/',
+            'section': 'lbo',
+            'tags': ['private-equity', 'lbo', 'buyout', 'pe']
+        },
+        {
+            'name': 'Private Equity Wire',
+            'url': 'https://www.privateequitywire.co.uk/rss.xml',
+            'section': 'lbo',
+            'tags': ['private-equity', 'lbo', 'buyout', 'pe']
+        },
+        {
+            'name': 'MarketWatch - Business',
+            'url': 'https://feeds.marketwatch.com/marketwatch/business/',
+            'section': 'lbo',
+            'tags': ['private-equity', 'lbo', 'buyout', 'business']
         }
     ],
     'altcoin_news': [

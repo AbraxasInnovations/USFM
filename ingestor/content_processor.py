@@ -110,12 +110,12 @@ class ContentProcessor:
             return 'ma'
         
         # LBO/PE keywords
-        lbo_keywords = ['private equity', 'lbo', 'leveraged buyout', 'pe firm', 'private equity firm']
+        lbo_keywords = ['private equity', 'lbo', 'leveraged buyout', 'pe firm', 'private equity firm', 'kohlberg', 'kkr', 'blackstone', 'carlyle', 'apollo', 'bain capital', 'tpg', 'warburg pincus', 'general atlantic', 'silver lake', 'thoma bravo', 'buyout', 'going private', 'take private']
         if any(keyword in text for keyword in lbo_keywords):
             return 'lbo'
         
         # Regulatory keywords
-        reg_keywords = ['antitrust', 'ftc', 'doj', 'regulatory', 'approval', 'investigation', 'settlement']
+        reg_keywords = ['antitrust', 'ftc', 'doj', 'regulatory', 'approval', 'investigation', 'settlement', 'federal trade commission', 'department of justice', 'sec filing', 'regulatory approval', 'antitrust review', 'merger review', 'competition', 'monopoly', 'oligopoly', 'regulatory compliance', 'government approval']
         if any(keyword in text for keyword in reg_keywords):
             return 'reg'
         
