@@ -138,7 +138,7 @@ export async function GET(request: NextRequest) {
               post.title.toLowerCase().includes('bitcoin') ||
               post.title.toLowerCase().includes('blockchain') ||
               post.title.toLowerCase().includes('altcoin') ||
-              post.tags?.some(tag => ['crypto', 'bitcoin', 'blockchain', 'altcoin'].includes(tag.toLowerCase()))
+               post.tags?.some((tag: string) => ['crypto', 'bitcoin', 'blockchain', 'altcoin'].includes(tag.toLowerCase()))
             )
           )
         }
