@@ -16,7 +16,7 @@ export default function TopHeadlines({ posts }: TopHeadlinesProps) {
     <div className="top-headlines">
       <h3 className="headlines-title">Top Headlines</h3>
       <div className="headlines-list">
-        {posts.slice(0, 6).map((post, index) => (
+        {posts.slice(0, 8).map((post, index) => (
           <div key={post.id} className="headline-item">
             <div className="headline-number">{index + 1}</div>
             <div className="headline-content">

@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 
     // Smart content management logic
     const sectionThresholds = {
-      'ma': 3,
+      'ma': 5,  // Increased from 3 to 5 to preserve more M&A history
       'lbo': 3,
       'reg': 3,
       'cap': 3,
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     }
 
     const fallbackRetentionDays = 14
-    const cutoffTime = new Date(Date.now() - 2 * 60 * 60 * 1000) // 2 hours ago
+    const cutoffTime = new Date(Date.now() - 6 * 60 * 60 * 1000) // 6 hours ago (increased from 2 hours)
     const fallbackCutoff = new Date(Date.now() - fallbackRetentionDays * 24 * 60 * 60 * 1000) // 14 days ago
     
     // Debug logging (can be removed in production)

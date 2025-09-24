@@ -46,12 +46,6 @@ export default function FeaturedArticle({ post }: FeaturedArticleProps) {
           <p className="featured-summary">{post.summary}</p>
         )}
         
-        {post.excerpt && (
-          <blockquote className="featured-excerpt">
-            {post.excerpt}
-          </blockquote>
-        )}
-        
         <div className="featured-footer">
           <span className="source">By {post.source_name}</span>
                       {post.tags && post.tags.length > 0 && (

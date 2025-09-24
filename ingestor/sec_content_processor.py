@@ -12,6 +12,7 @@ import random
 from sec_scraper import SECScraper
 from article_rewriter import ArticleRewriter
 from content_processor import ContentProcessor
+from database import DatabaseManager
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,7 @@ class SECContentProcessor:
         self.sec_scraper = SECScraper()
         self.article_rewriter = ArticleRewriter()
         self.content_processor = ContentProcessor()
+        self.db = DatabaseManager()
 
     def process_s4_filings(self, max_filings: int = 3) -> List[Dict]:
         """
@@ -35,20 +37,30 @@ class SECContentProcessor:
                 logger.warning("No S-4 filings found")
                 return []
             
+            # Step 1.5: Deduplicate filings by accession number to avoid processing same deal multiple times
+            unique_filings = self._deduplicate_filings_by_accession(filings)
+            logger.info(f"After deduplication: {len(unique_filings)} unique filings from {len(filings)} total")
+            
             processed_filings = []
             
-            for i, filing in enumerate(filings):
+            for i, filing in enumerate(unique_filings):
                 try:
-                    logger.info(f"Processing S-4 filing {i+1}/{len(filings)}: {filing['company_name']}")
+                    logger.info(f"Processing S-4 filing {i+1}/{len(unique_filings)}: {filing['company_name']}")
                     
-                    # Step 2: Scrape filing content
+                    # Step 2: Check if this filing already exists
+                    temp_content_hash = self.db.generate_content_hash(filing['document_url'], filing['title'])
+                    if self.db.post_exists(temp_content_hash):
+                        logger.info(f"S-4 filing already exists, skipping: {filing['company_name']}")
+                        continue
+                    
+                    # Step 3: Scrape filing content
                     filing_content = self.sec_scraper.scrape_filing_content(filing)
                     
                     if not filing_content:
                         logger.warning(f"Failed to scrape content for {filing['company_name']}")
                         continue
                     
-                    # Step 3: Rewrite with AI
+                    # Step 4: Rewrite with AI
                     rewritten_data = self.article_rewriter.rewrite_article(
                         title=filing_content['title'],
                         content=filing_content['content']
@@ -58,7 +70,7 @@ class SECContentProcessor:
                         logger.warning(f"Failed to rewrite S-4 filing: {filing_content['title']}")
                         continue
                     
-                    # Step 4: Process for our system
+                    # Step 5: Process for our system
                     processed_filing = self._process_filing_data(
                         original_filing=filing,
                         filing_content=filing_content,
@@ -79,6 +91,9 @@ class SECContentProcessor:
         except Exception as e:
             logger.error(f"Error in S-4 filing processing: {e}")
             return []
+        finally:
+            # Close database connection
+            self.db.close()
 
     def _process_filing_data(self, original_filing: Dict, filing_content: Dict, rewritten_data: Dict) -> Optional[Dict]:
         """
@@ -113,7 +128,7 @@ class SECContentProcessor:
             
             # Generate consistent content hash (same as database manager)
             content_hash = hashlib.sha256(
-                f"{filing_content['url']}{rewritten_data['title']}".lower().strip().encode('utf-8')
+                f"{filing_content['url']}{rewritten_data['title']}".lower().strip().encode()
             ).hexdigest()
             
             # Prepare post data
@@ -153,6 +168,25 @@ class SECContentProcessor:
         # Add sec prefix to make it unique
         slug = f"sec-{slug}"
         return slug
+
+    def _deduplicate_filings_by_accession(self, filings: List[Dict]) -> List[Dict]:
+        """
+        Deduplicate filings by accession number to avoid processing the same deal multiple times
+        (e.g., multiple Fossil entities filing for the same transaction)
+        """
+        seen_accessions = set()
+        unique_filings = []
+        
+        for filing in filings:
+            accession_number = filing.get('accession_number', '')
+            if accession_number and accession_number not in seen_accessions:
+                seen_accessions.add(accession_number)
+                unique_filings.append(filing)
+                logger.info(f"Keeping unique filing: {filing['company_name']} - {accession_number}")
+            else:
+                logger.info(f"Skipping duplicate filing: {filing['company_name']} - {accession_number}")
+        
+        return unique_filings
 
     def _get_sec_image_url(self) -> str:
         """Get a random SEC image URL from our custom images"""
