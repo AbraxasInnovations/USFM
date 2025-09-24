@@ -13,7 +13,7 @@ async function getSectionPosts(slug: string): Promise<Post[]> {
       : 'http://localhost:3000'
     
     const response = await fetch(`${baseUrl}/api/smart-content`, {
-      cache: 'no-store' // Always get fresh data
+      next: { revalidate: 60 } // Use ISR with 60 second revalidation
     })
     
     if (!response.ok) {
