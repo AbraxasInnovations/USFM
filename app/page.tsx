@@ -10,59 +10,81 @@ import AdSense from '@/components/AdSense'
 
 // This function runs on the server
 async function getSmartContent(): Promise<{ posts: Post[], sections: Section[], smartContent: any }> {
-  try {
-    // Fetch smart content from our API
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : 'http://localhost:3000'
-    
-    const response = await fetch(`${baseUrl}/api/smart-content`, {
-      next: { revalidate: 60 } // Use ISR with 60 second revalidation
-    })
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch smart content')
-    }
-    
-    const { smartContent } = await response.json()
-    
-    // Get sections
-    const { data: sections, error: sectionsError } = await supabase
-      .from('sections')
-      .select('*')
-      .order('name')
+  // Get all posts and sections directly from database
+  const { data: allPosts, error: postsError } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('status', 'published')
+    .order('created_at', { ascending: false })
+    .limit(100)
 
-    if (sectionsError) {
-      console.error('Error fetching sections:', sectionsError)
-      return { posts: [], sections: [], smartContent: {} }
-    }
+  const { data: sections, error: sectionsError } = await supabase
+    .from('sections')
+    .select('*')
+    .order('name')
 
-    // Get homepage posts from smart content
-    const posts = smartContent.homepage || []
-    
-    return { posts, sections: sections || [], smartContent }
-    
-  } catch (error) {
-    console.error('Error fetching smart content:', error)
-    
-    // Fallback to regular posts if smart content fails
-    const { data: posts, error: postsError } = await supabase
-      .from('posts')
-      .select('*')
-      .eq('status', 'published')
-      .order('created_at', { ascending: false })
-      .limit(30)
+  if (postsError || sectionsError) {
+    console.error('Error fetching data:', postsError || sectionsError)
+    return { posts: [], sections: [], smartContent: {} }
+  }
 
-    const { data: sections, error: sectionsError } = await supabase
-      .from('sections')
-      .select('*')
-      .order('name')
+  // Implement Bloomberg prioritization logic
+  const posts = allPosts || []
+  const cutoffTime = new Date(Date.now() - 6 * 60 * 60 * 1000) // 6 hours ago
 
-    return { 
-      posts: posts || [], 
-      sections: sections || [], 
-      smartContent: { homepage: posts || [] }
-    }
+  // Separate Bloomberg posts from other posts
+  const bloombergPosts = posts.filter(post => 
+    post.source_name?.toLowerCase().includes('bloomberg')
+  )
+
+  const nonBloombergPosts = posts.filter(post => 
+    !post.source_name?.toLowerCase().includes('bloomberg')
+  )
+
+  // Sort Bloomberg posts by date (most recent first)
+  bloombergPosts.sort((a, b) => 
+    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  )
+
+  // Sort non-Bloomberg posts: scraped content first, then by created_at desc
+  nonBloombergPosts.sort((a, b) => {
+    // Prioritize scraped content
+    if (a.scraped_content && !b.scraped_content) return -1
+    if (!a.scraped_content && b.scraped_content) return 1
+    
+    // If both are scraped or both are not scraped, sort by date
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  })
+
+  // Create homepage content with Bloomberg prioritization:
+  // 1. First post: Bloomberg (for featured article)
+  // 2. Next posts: Diversified mix for top headlines
+  let homepagePosts = []
+
+  // Add Bloomberg post for featured article (if available)
+  if (bloombergPosts.length > 0) {
+    homepagePosts.push(bloombergPosts[0])
+  }
+
+  // Add remaining posts for the rest of homepage
+  const remainingPosts = [...bloombergPosts.slice(1), ...nonBloombergPosts]
+  homepagePosts = [...homepagePosts, ...remainingPosts]
+
+  // Create smart content structure for sections
+  const smartContent: any = {
+    homepage: homepagePosts.slice(0, 30)
+  }
+
+  // Add section-specific content
+  sections?.forEach(section => {
+    const sectionPosts = posts.filter(post => post.section_slug === section.slug)
+    smartContent[section.slug] = sectionPosts.slice(0, 5) // Limit to 5 posts per section
+  })
+
+  return { 
+    posts: homepagePosts.slice(0, 30), 
+    sections: sections || [], 
+    smartContent 
   }
 }
 
