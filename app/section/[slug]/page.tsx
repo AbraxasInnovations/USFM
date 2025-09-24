@@ -6,64 +6,21 @@ import { notFound } from 'next/navigation'
 
 // This function runs on the server
 async function getSectionPosts(slug: string): Promise<Post[]> {
-  try {
-    // Use smart content API to ensure section is always populated
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : 'http://localhost:3000'
-    
-    const response = await fetch(`${baseUrl}/api/smart-content`, {
-      next: { revalidate: 60 } // Use ISR with 60 second revalidation
-    })
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch smart content')
-    }
-    
-    const { smartContent } = await response.json()
-    
-    // Get smart content for this section
-    const sectionPosts = smartContent[slug] || []
-    
-    if (sectionPosts.length > 0) {
-      return sectionPosts
-    }
-    
-    // Fallback to direct query if smart content fails
-    const { data, error } = await supabase
-      .from('posts')
-      .select('*')
-      .eq('status', 'published')
-      .eq('section_slug', slug)
-      .order('created_at', { ascending: false })
-      .limit(20)
+  // Use direct database query for simplicity and reliability
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('status', 'published')
+    .eq('section_slug', slug)
+    .order('created_at', { ascending: false })
+    .limit(20)
 
-    if (error) {
-      console.error('Error fetching posts:', error)
-      return []
-    }
-
-    return data || []
-    
-  } catch (error) {
-    console.error('Error fetching smart content:', error)
-    
-    // Fallback to direct query
-    const { data: fallbackData, error: fallbackError } = await supabase
-      .from('posts')
-      .select('*')
-      .eq('status', 'published')
-      .eq('section_slug', slug)
-      .order('created_at', { ascending: false })
-      .limit(20)
-
-    if (fallbackError) {
-      console.error('Error fetching posts:', fallbackError)
-      return []
-    }
-
-    return fallbackData || []
+  if (error) {
+    console.error('Error fetching posts:', error)
+    return []
   }
+
+  return data || []
 }
 
 async function getSections(): Promise<Section[]> {
