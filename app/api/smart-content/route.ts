@@ -157,32 +157,67 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Handle homepage content
+    // Handle homepage content with Bloomberg prioritization for featured article only
     const allRecentPosts = allPosts?.filter(post => 
       new Date(post.created_at) > cutoffTime
     ) || []
     
-    if (allRecentPosts.length >= 30) {
-      smartContent['homepage'] = allRecentPosts.slice(0, 30)
-    } else {
-      const needed = 30 - allRecentPosts.length
-      const fallbackPosts = allPosts?.filter(post => {
-        const postDate = new Date(post.created_at)
-        return postDate <= cutoffTime && postDate >= fallbackCutoff
-      }) || []
+    // Separate Bloomberg posts from other posts
+    const bloombergPosts = allPosts?.filter(post => 
+      post.source_name?.toLowerCase().includes('bloomberg')
+    ) || []
+    
+    const nonBloombergPosts = allPosts?.filter(post => 
+      !post.source_name?.toLowerCase().includes('bloomberg')
+    ) || []
+    
+    // Sort Bloomberg posts by date (most recent first)
+    bloombergPosts.sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    )
+    
+    // Sort non-Bloomberg posts: scraped content first, then by created_at desc
+    nonBloombergPosts.sort((a, b) => {
+      // Prioritize scraped content
+      if (a.scraped_content && !b.scraped_content) return -1
+      if (!a.scraped_content && b.scraped_content) return 1
       
-      // Sort fallback posts: scraped content first, then by created_at desc
-      fallbackPosts.sort((a, b) => {
-        // Prioritize scraped content
-        if (a.scraped_content && !b.scraped_content) return -1
-        if (!a.scraped_content && b.scraped_content) return 1
-        
-        // If both are scraped or both are not scraped, sort by date
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      })
-      
-      smartContent['homepage'] = [...allRecentPosts, ...fallbackPosts.slice(0, needed)].slice(0, 30)
+      // If both are scraped or both are not scraped, sort by date
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    })
+    
+    // Create diversified homepage content:
+    // 1. First post: Bloomberg (for featured article)
+    // 2. Next 6 posts: Diversified mix for top headlines
+    // 3. Remaining posts: All content mixed
+    
+    let homepagePosts = []
+    
+    // Add Bloomberg post for featured article (if available)
+    if (bloombergPosts.length > 0) {
+      homepagePosts.push(bloombergPosts[0])
     }
+    
+    // Create diversified mix for top headlines (positions 1-6)
+    const topHeadlinesMix = []
+    const remainingBloomberg = bloombergPosts.slice(1) // Skip first Bloomberg (already used for featured)
+    const allOtherPosts = [...remainingBloomberg, ...nonBloombergPosts]
+    
+    // Sort all other posts by date for diversification
+    allOtherPosts.sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    )
+    
+    // Take first 6 posts for top headlines (diversified mix)
+    topHeadlinesMix.push(...allOtherPosts.slice(0, 6))
+    
+    // Add remaining posts for the rest of homepage
+    const remainingPosts = allOtherPosts.slice(6)
+    
+    // Combine: Featured (Bloomberg) + Top Headlines (Diversified) + Rest
+    homepagePosts = [...homepagePosts, ...topHeadlinesMix, ...remainingPosts]
+    
+    smartContent['homepage'] = homepagePosts.slice(0, 30)
 
     return NextResponse.json({
       smartContent,
