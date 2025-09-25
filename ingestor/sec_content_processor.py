@@ -193,12 +193,16 @@ class SECContentProcessor:
 
     def _get_sec_image_url(self) -> str:
         """Get a random SEC image URL from our custom images"""
-        # Available SEC images
-        sec_images = ['sec1.jpg', 'sec2.jpg', 'sec3.jpg', 'sec4.jpg']
-        
+        # Available SEC images (including new ones)
+        sec_images = [
+            'sec1.jpg', 'sec2.jpg', 'sec3.jpg', 'sec4.jpg', 'sec8.jpg',
+            'sec23.jpg', 'sec24.jpg', 'sec25.jpg', 'sec26.jpg', 
+            'sec27.jpg', 'sec28.jpg', 'sec29.jpg'
+        ]
+
         # Randomly select one
         selected_image = random.choice(sec_images)
-        
+
         # Return the full URL path
         return f"/images/sec/{selected_image}"
     
