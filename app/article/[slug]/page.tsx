@@ -122,47 +122,66 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#fefefe]">
+    <div className="min-h-screen bg-white">
       <Header sections={sections} />
       
-      <main className="container mx-auto px-4 py-12">
-        <article className="max-w-4xl mx-auto">
-          {/* Article Header - More Spacious */}
-          <header className="mb-12">
-            <div className="mb-6">
-              <span className="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-4 py-2 rounded-full">
-                {article.section_slug.toUpperCase()}
-              </span>
-            </div>
+      <main className="container mx-auto px-4 py-8">
+        <article className="max-w-4xl mx-auto bg-white shadow-sm rounded-lg p-8 md:p-12">
+            {/* Article Header - Newsletter Style */}
+            <header className="mb-16">
             
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-8 leading-tight">
+            {/* Thumbnail Image for SEC Articles - Centered with More Space */}
+            {article.image_url && (
+              <div className="flex justify-center items-center" style={{ marginTop: '3rem', marginBottom: '4rem', width: '100%' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                  <img 
+                    src={article.image_url} 
+                    alt={article.title}
+                    className="h-64 md:h-80 object-cover rounded-lg shadow-lg"
+                    style={{ 
+                      maxWidth: '800px', 
+                      width: '100%',
+                      display: 'block',
+                      margin: '0 auto'
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+            
+            <h1 className="text-3xl md:text-5xl font-extrabold text-black mb-8 leading-tight text-center" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', letterSpacing: '-0.02em' }}>
               {article.title}
             </h1>
             
-            <div className="flex items-center text-gray-600 text-base mb-8">
+            <div className="flex items-center justify-center text-gray-600 text-base mb-8">
               <span className="font-medium">By {article.source_name}</span>
               <span className="mx-3">•</span>
               <span>{formatDate(article.created_at)}</span>
             </div>
             
             {article.summary && (
-              <div className="bg-gray-50 border-l-4 border-blue-500 p-6 mb-8">
-                <p className="text-xl text-gray-800 leading-relaxed font-medium">
+              <div className="bg-gray-50 border-l-4 border-blue-500 p-8 mb-12 rounded-r-lg">
+                <p className="text-lg text-gray-800 leading-relaxed font-medium">
                   {article.summary}
                 </p>
               </div>
             )}
           </header>
 
-          {/* Article Content - Better Typography */}
+          {/* Article Content - Newsletter Style Typography */}
           {article.scraped_content && (
-            <div className="article-content mb-16">
+            <div className="article-content mb-20">
               <div 
-                className="text-gray-800 leading-relaxed text-lg space-y-6"
+                className="prose prose-lg max-w-none text-gray-800 leading-relaxed"
+                style={{
+                  fontFamily: 'Georgia, "Times New Roman", serif',
+                  lineHeight: '1.8',
+                  fontSize: '18px'
+                }}
                 dangerouslySetInnerHTML={{ 
                   __html: article.scraped_content
-                    .replace(/\n\n/g, '</p><p class="mb-6">')
-                    .replace(/^/, '<p class="mb-6">')
+                    .replace(/\n\n/g, '</p><p class="mb-10 text-gray-800 leading-relaxed" style="font-size: 18px; line-height: 1.8;">')
+                    .replace(/^/, '<p class="mb-10 text-gray-800 leading-relaxed" style="font-size: 18px; line-height: 1.8;">')
                     .replace(/$/, '</p>')
                 }}
               />

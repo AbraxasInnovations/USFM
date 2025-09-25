@@ -36,21 +36,19 @@ class DeliveryManager:
         # Format the post for X/Twitter
         title = post_data['title']
         summary = post_data.get('summary', '')
-        url = post_data['source_url']
         section = post_data.get('section_slug', '').upper()
+        origin_type = post_data.get('origin_type', '').upper()
         
-        # Create hashtags based on section and tags
-        hashtags = []
-        if section:
-            hashtags.append(f"#{section}")
+        # Determine the URL to use
+        if origin_type == 'SCRAPED' and post_data.get('article_slug'):
+            # For SEC rewritten articles, link to our website
+            url = f"https://usfinancemoves.com/article/{post_data['article_slug']}"
+        else:
+            # For other content, use original source URL
+            url = post_data['source_url']
         
-        # Add relevant hashtags based on content
-        if 'merger' in title.lower() or 'acquisition' in title.lower():
-            hashtags.append('#M&A')
-        if 'crypto' in title.lower() or 'bitcoin' in title.lower():
-            hashtags.append('#Crypto')
-        if 'sec' in title.lower() or 'filing' in title.lower():
-            hashtags.append('#SEC')
+        # Fixed hashtags as requested
+        hashtags = "#specialsituations #MA #PE #news #viral #finance"
         
         # Create the tweet text (X has a 280 character limit)
         tweet_text = f"📈 {title}"
@@ -60,10 +58,8 @@ class DeliveryManager:
             tweet_text += f"\n\n{summary}"
         
         # Add hashtags
-        if hashtags:
-            hashtag_text = " ".join(hashtags[:3])  # Limit to 3 hashtags
-            if len(tweet_text) + len(hashtag_text) + 25 < 280:  # Leave room for URL
-                tweet_text += f"\n\n{hashtag_text}"
+        if len(tweet_text) + len(hashtags) + 25 < 280:  # Leave room for URL
+            tweet_text += f"\n\n{hashtags}"
         
         # Add URL (shortened URLs are typically 23 characters)
         if len(tweet_text) + 25 < 280:  # Leave room for URL and spaces
@@ -107,18 +103,17 @@ class DeliveryManager:
         title = post_data.get('title', '').lower()
         section = post_data.get('section_slug', '').lower()
         origin_type = post_data.get('origin_type', '').upper()
+        source_name = post_data.get('source_name', '').lower()
         
         # Only tweet high-priority content:
-        # 1. SEC filings (S-4, mergers, acquisitions)
-        if origin_type == 'SEC' and any(keyword in title for keyword in ['merger', 'acquisition', 's-4', 'filing']):
+        # 1. SEC rewritten articles (SCRAPED origin type with article_slug)
+        if (origin_type == 'SCRAPED' and 
+            post_data.get('article_slug') and 
+            any(keyword in title for keyword in ['merger', 'acquisition', 's-4', 'filing', 'sec'])):
             return True
             
-        # 2. Major M&A deals
-        if section in ['merger', 'acquisition'] and any(keyword in title for keyword in ['billion', 'million', 'major', 'strategic']):
-            return True
-            
-        # 3. Regulatory news
-        if section in ['regulatory', 'antitrust'] and any(keyword in title for keyword in ['doj', 'ftc', 'sec', 'regulatory']):
+        # 2. Private Equity Wire content
+        if 'private equity wire' in source_name:
             return True
             
         # Skip everything else to conserve free tier limits

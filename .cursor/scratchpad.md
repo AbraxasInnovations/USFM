@@ -368,3 +368,51 @@ Transform the static finance news site into a comprehensive US Finance Deal Feed
 - Articles include crypto-specific tags for filtering
 - High-quality images from Cointelegraph enhance visual appeal
 - Content automatically refreshed every hour with latest crypto market developments
+
+### SEC S-4 Filing Duplication & Content Management Issues
+
+**Current Status (December 2024):** SEC S-4 filing processor is functional but experiencing duplication and content management challenges.
+
+**Problem Summary:**
+1. **SEC Duplication Issue:** The SEC processor was creating multiple articles about the same companies (e.g., multiple Fossil Group articles) because it wasn't checking for recent coverage of the same company
+2. **Homepage Article Count Issue:** M&A section showing only 2 articles instead of 3 due to inconsistent smart content logic between homepage and API
+3. **Vercel Deployment Conflicts:** Homepage was trying to fetch from smart content API during build time, causing deployment failures
+
+**Root Causes Identified:**
+1. **Content Hash Mismatch:** SEC processor was generating content hashes differently than the database manager, causing duplicate detection to fail
+2. **Company Repetition:** No check for whether we'd already written about a specific company recently (within 7 days)
+3. **API Dependency:** Homepage was calling smart content API during static generation, which doesn't work on Vercel
+
+**Solutions Implemented:**
+1. **Fixed Content Hash Generation:** Made SEC processor use `self.db.generate_content_hash()` method for consistency with database manager
+2. **Added Company-Based Deduplication:** Implemented `_has_recent_company_article()` method that checks if we've written about a company in the last 7 days
+3. **Enhanced Duplicate Prevention:** Added three layers of deduplication:
+   - **Accession Number:** Prevents multiple filings for the same deal
+   - **Content Hash:** Prevents exact duplicate articles  
+   - **Company Repetition:** Prevents writing about same company multiple times in a week
+4. **Fixed Homepage Logic:** Reverted homepage to use direct database queries with same smart content logic as API (for Vercel compatibility)
+
+**Technical Implementation:**
+- **File:** `ingestor/sec_content_processor.py` - Enhanced with company-based deduplication and consistent content hash generation
+- **File:** `app/page.tsx` - Fixed to use direct database queries instead of API calls during build time
+- **Method:** `_has_recent_company_article()` - Searches title, summary, and company_name fields for recent articles about the same company
+
+**Current State:**
+- ✅ SEC processor no longer creates duplicate articles about same companies
+- ✅ Homepage shows correct number of articles (3) in each section
+- ✅ Vercel deployment compatibility restored
+- ✅ Smart content logic consistent across homepage and API
+- ✅ Three-layer deduplication system prevents all types of duplicates
+
+**How to Reference This in Future:**
+- **Search for:** "SEC S-4 Filing Duplication" or "Company Repetition Issue"
+- **Key Files:** `ingestor/sec_content_processor.py`, `app/page.tsx`
+- **Critical Methods:** `_has_recent_company_article()`, `_deduplicate_filings_by_accession()`
+- **Database Fields:** `content_hash`, `company_name`, `accession_number`
+- **Deployment Note:** Homepage must use direct database queries, not API calls, for Vercel compatibility
+
+**Next Steps for SEC Section:**
+1. Monitor for any remaining duplication issues
+2. Consider adjusting the 7-day company repetition window based on content volume
+3. Test with live SEC data to ensure all deduplication layers work correctly
+4. Consider adding more sophisticated company name matching (e.g., "Fossil Group" vs "Fossil Group Inc.")

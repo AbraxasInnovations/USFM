@@ -10,7 +10,7 @@ import AdSense from '@/components/AdSense'
 
 // This function runs on the server
 async function getSmartContent(): Promise<{ posts: Post[], sections: Section[], smartContent: any }> {
-  // Get all posts and sections directly from database
+  // Get all posts and sections directly from database (for Vercel compatibility)
   const { data: allPosts, error: postsError } = await supabase
     .from('posts')
     .select('*')
@@ -28,16 +28,72 @@ async function getSmartContent(): Promise<{ posts: Post[], sections: Section[], 
     return { posts: [], sections: [], smartContent: {} }
   }
 
-  // Implement Bloomberg prioritization logic
+  // Implement the same smart content logic as the API
   const posts = allPosts || []
-  const cutoffTime = new Date(Date.now() - 6 * 60 * 60 * 1000) // 6 hours ago
+  const sectionThresholds = {
+    'ma': 5,  // M&A section threshold
+    'lbo': 3,
+    'reg': 3,
+    'cap': 3,
+    'rumor': 3,
+    'all': 20
+  }
 
+  const cutoffTime = new Date(Date.now() - 6 * 60 * 60 * 1000) // 6 hours ago
+  
+  // Group posts by section
+  const postsBySection: { [key: string]: any[] } = {}
+  for (const post of posts) {
+    const section = post.section_slug || 'cap'
+    if (!postsBySection[section]) {
+      postsBySection[section] = []
+    }
+    postsBySection[section].push(post)
+  }
+
+  // Apply smart content management to each section
+  const smartContent: { [key: string]: any[] } = {}
+  
+  for (const section of sections || []) {
+    const sectionSlug = section.slug
+    const threshold = sectionThresholds[sectionSlug as keyof typeof sectionThresholds] || 3
+    const newPosts = postsBySection[sectionSlug] || []
+    
+    // Sort all posts by priority: scraped content first, then by created_at desc
+    const sortedPosts = [...newPosts].sort((a, b) => {
+      // Prioritize scraped content
+      if (a.scraped_content && !b.scraped_content) return -1
+      if (!a.scraped_content && b.scraped_content) return 1
+      
+      // If both are scraped or both are not scraped, sort by date
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    })
+    
+    // Filter for recent posts (last 6 hours) from sorted list
+    const recentPosts = sortedPosts.filter(post => 
+      new Date(post.created_at) > cutoffTime
+    )
+    
+    if (recentPosts.length >= threshold) {
+      // Use recent posts if we have enough
+      smartContent[sectionSlug] = recentPosts.slice(0, threshold)
+    } else {
+      // Not enough recent posts - use the best available posts to fill to threshold
+      const needed = threshold
+      const availablePosts = sortedPosts.slice(0, needed)
+      smartContent[sectionSlug] = availablePosts
+    }
+  }
+
+  // Create homepage posts with Bloomberg prioritization
+  const allPostsForHomepage = Object.values(smartContent).flat().filter(post => post)
+  
   // Separate Bloomberg posts from other posts
-  const bloombergPosts = posts.filter(post => 
+  const bloombergPosts = allPostsForHomepage.filter(post => 
     post.source_name?.toLowerCase().includes('bloomberg')
   )
 
-  const nonBloombergPosts = posts.filter(post => 
+  const nonBloombergPosts = allPostsForHomepage.filter(post => 
     !post.source_name?.toLowerCase().includes('bloomberg')
   )
 
@@ -69,17 +125,6 @@ async function getSmartContent(): Promise<{ posts: Post[], sections: Section[], 
   // Add remaining posts for the rest of homepage
   const remainingPosts = [...bloombergPosts.slice(1), ...nonBloombergPosts]
   homepagePosts = [...homepagePosts, ...remainingPosts]
-
-  // Create smart content structure for sections
-  const smartContent: any = {
-    homepage: homepagePosts.slice(0, 30)
-  }
-
-  // Add section-specific content
-  sections?.forEach(section => {
-    const sectionPosts = posts.filter(post => post.section_slug === section.slug)
-    smartContent[section.slug] = sectionPosts.slice(0, 5) // Limit to 5 posts per section
-  })
 
   return { 
     posts: homepagePosts.slice(0, 30), 

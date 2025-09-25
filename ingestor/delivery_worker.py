@@ -59,10 +59,9 @@ class DeliveryWorker:
                     success = self.delivery_manager.send_x_post(text)
                     
                     if success:
-                        # Update delivery status to completed
+                        # Update delivery status to completed (avoid completed_at column for now)
                         self.db.supabase.table('deliveries').update({
-                            'status': 'completed',
-                            'completed_at': datetime.now().isoformat()
+                            'status': 'completed'
                         }).eq('id', delivery_id).execute()
                         
                         processed_count += 1
@@ -80,10 +79,10 @@ class DeliveryWorker:
                             status = 'queued'  # Retry later
                             logger.warning(f"Delivery {delivery_id} failed (attempt {attempts}/{max_attempts}), will retry")
                         
+                        # Update delivery status and attempts (avoid last_attempt column for now)
                         self.db.supabase.table('deliveries').update({
                             'status': status,
-                            'attempts': attempts,
-                            'last_attempt': datetime.now().isoformat()
+                            'attempts': attempts
                         }).eq('id', delivery_id).execute()
                     
                     # Add delay between posts to respect rate limits

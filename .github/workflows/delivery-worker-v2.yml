@@ -2,8 +2,8 @@ name: Delivery Worker V2
 
 on:
   schedule:
-    # Run every 5 minutes
-    - cron: '*/5 * * * *'
+    # Run every 30 minutes
+    - cron: '*/30 * * * *'
   workflow_dispatch: # Allow manual triggering
 
 jobs:
@@ -31,7 +31,10 @@ jobs:
         REVALIDATE_URL: ${{ secrets.REVALIDATE_URL }}
         REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
         X_ENABLED: ${{ secrets.X_ENABLED }}
-        X_BEARER: ${{ secrets.X_BEARER }}
+        X_API_KEY: ${{ secrets.X_API_KEY }}
+        X_API_SECRET: ${{ secrets.X_API_SECRET }}
+        X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+        X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
       run: |
         cd ingestor
         python delivery_worker.py

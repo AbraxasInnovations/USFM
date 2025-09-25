@@ -47,11 +47,8 @@ class SECContentProcessor:
                 try:
                     logger.info(f"Processing S-4 filing {i+1}/{len(unique_filings)}: {filing['company_name']}")
                     
-                    # Step 2: Check if this filing already exists
-                    temp_content_hash = self.db.generate_content_hash(filing['document_url'], filing['title'])
-                    if self.db.post_exists(temp_content_hash):
-                        logger.info(f"S-4 filing already exists, skipping: {filing['company_name']}")
-                        continue
+                    # Step 2: Check if this filing already exists (we'll check after scraping since we need the final URL)
+                    # This check will be done after we have the filing content and rewritten title
                     
                     # Step 3: Scrape filing content
                     filing_content = self.sec_scraper.scrape_filing_content(filing)
@@ -68,6 +65,18 @@ class SECContentProcessor:
                     
                     if not rewritten_data:
                         logger.warning(f"Failed to rewrite S-4 filing: {filing_content['title']}")
+                        continue
+                    
+                    # Step 4.5: Check if this rewritten article already exists
+                    content_hash = self.db.generate_content_hash(filing_content['url'], rewritten_data['title'])
+                    if self.db.post_exists(content_hash):
+                        logger.info(f"Rewritten S-4 article already exists, skipping: {rewritten_data['title'][:50]}...")
+                        continue
+                    
+                    # Step 4.6: Check if we've already written about this company recently (within last 7 days)
+                    company_name = original_filing.get('company_name', '').lower().strip()
+                    if company_name and self._has_recent_company_article(company_name, days_back=7):
+                        logger.info(f"Already wrote about {company_name} recently, skipping to avoid repetition")
                         continue
                     
                     # Step 5: Process for our system
@@ -126,11 +135,6 @@ class SECContentProcessor:
             # Generate slug
             article_slug = self._generate_slug(rewritten_data['title'])
             
-            # Generate consistent content hash (same as database manager)
-            content_hash = hashlib.sha256(
-                f"{filing_content['url']}{rewritten_data['title']}".lower().strip().encode()
-            ).hexdigest()
-            
             # Prepare post data
             post_data = {
                 'title': rewritten_data['title'],
@@ -140,7 +144,6 @@ class SECContentProcessor:
                 'source_url': filing_content['url'],
                 'section_slug': section_slug,
                 'tags': tags,
-                'content_hash': content_hash,
                 'status': 'published',
                 'origin_type': 'SCRAPED',
                 'image_url': self._get_sec_image_url(),  # Use custom SEC images
@@ -198,6 +201,33 @@ class SECContentProcessor:
         
         # Return the full URL path
         return f"/images/sec/{selected_image}"
+    
+    def _has_recent_company_article(self, company_name: str, days_back: int = 7) -> bool:
+        """
+        Check if we've already written about this company recently
+        """
+        try:
+            from datetime import datetime, timedelta
+            
+            # Calculate cutoff date
+            cutoff_date = datetime.now() - timedelta(days=days_back)
+            cutoff_date_str = cutoff_date.strftime('%Y-%m-%d')
+            
+            # Search for recent articles about this company
+            # Look in title, summary, and company_name fields
+            result = self.db.supabase.table('posts').select('id').or_(
+                f"title.ilike.%{company_name}%,summary.ilike.%{company_name}%,company_name.ilike.%{company_name}%"
+            ).gte('created_at', cutoff_date_str).execute()
+            
+            has_recent = len(result.data) > 0
+            if has_recent:
+                logger.info(f"Found {len(result.data)} recent articles about {company_name}")
+            
+            return has_recent
+            
+        except Exception as e:
+            logger.error(f"Error checking for recent company articles: {e}")
+            return False  # If there's an error, don't block the processing
     
     def close(self):
         """Close resources"""

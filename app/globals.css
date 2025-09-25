@@ -51,29 +51,33 @@ body {
 }
 
 .hero-logo .logo-main {
-    font-size: 4.5rem;
-    font-weight: 600;
+    font-size: 5.5rem;
+    font-weight: 700;
     color: #00bfff;
     display: inline;
     line-height: 1;
     margin-right: 0.5rem;
+    letter-spacing: normal;
 }
 
 .hero-logo .logo-financial {
-    font-size: 4.5rem;
-    font-weight: 500;
+    font-size: 5.5rem;
+    font-weight: 700;
     color: #00bfff;
     display: inline;
     line-height: 1;
     margin-right: 0.5rem;
+    letter-spacing: normal;
 }
 
 .hero-logo .logo-moves {
-    font-size: 4.5rem;
-    font-weight: 500;
+    font-size: 5.5rem;
+    font-weight: 700;
     color: #000000;
     display: inline;
     line-height: 1;
+    margin-right: 0.5rem;
+    letter-spacing: normal;
 }
 
 .hero-tagline {
@@ -150,20 +154,23 @@ body {
 
 .compact-logo .logo-main {
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #00bfff;
+    letter-spacing: normal;
 }
 
 .compact-logo .logo-financial {
     font-size: 1.3rem;
-    font-weight: 500;
+    font-weight: 700;
     color: #00bfff;
+    letter-spacing: normal;
 }
 
 .compact-logo .logo-moves {
     font-size: 1.2rem;
-    font-weight: 500;
+    font-weight: 700;
     color: #000000;
+    letter-spacing: normal;
 }
 
 .compact-nav ul {
@@ -420,11 +427,13 @@ body {
 }
 
 .featured-title {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 2.2rem;
-    font-weight: 500;
-    color: #1a1a1a;
+    font-weight: 800;
+    color: #000000;
     margin-bottom: 1rem;
-    line-height: 1.2;
+    line-height: 1.5;
+    letter-spacing: -0.02em;
 }
 
 .featured-title a {
@@ -561,11 +570,13 @@ body {
 }
 
 .headline-title {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 1rem;
-    font-weight: 400;
-    color: #1a1a1a;
+    font-weight: 800;
+    color: #000000;
     margin-bottom: 0.5rem;
-    line-height: 1.4;
+    line-height: 1.5;
+    letter-spacing: -0.02em;
 }
 
 .headline-title a {
@@ -600,9 +611,13 @@ body {
     }
     
     .article-title {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         font-size: 1rem;
+        font-weight: 800;
+        color: #000000;
         line-height: 1.5;
         margin-bottom: 0.5rem;
+        letter-spacing: -0.02em;
     }
     
     .article-content {
@@ -659,11 +674,13 @@ body {
 }
 
 .article-title {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 1.1rem;
-    font-weight: 400;
-    color: #1a1a1a;
+    font-weight: 800;
+    color: #000000;
     margin-bottom: 0.75rem;
-    line-height: 1.4;
+    line-height: 1.5;
+    letter-spacing: -0.02em;
 }
 
 .article-title a {
@@ -994,15 +1011,15 @@ body {
     }
     
     .hero-logo .logo-main {
-        font-size: 3rem;
+        font-size: 3.5rem;
     }
     
     .hero-logo .logo-financial {
-        font-size: 3rem;
+        font-size: 3.5rem;
     }
     
     .hero-logo .logo-moves {
-        font-size: 3rem;
+        font-size: 3.5rem;
     }
     
     .hero-tagline {
@@ -1208,8 +1225,12 @@ body {
     }
     
     .article-title {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         font-size: 1rem;
+        font-weight: 800;
+        color: #000000;
         line-height: 1.4; /* Better line height for mobile */
+        letter-spacing: -0.02em;
     }
     
     .article-card {
@@ -1236,15 +1257,15 @@ body {
     }
     
     .hero-logo .logo-main {
-        font-size: 2.5rem;
+        font-size: 3rem;
     }
     
     .hero-logo .logo-financial {
-        font-size: 2.5rem;
+        font-size: 3rem;
     }
     
     .hero-logo .logo-moves {
-        font-size: 2.5rem;
+        font-size: 3rem;
     }
     
     .hero-tagline {
@@ -1449,10 +1470,13 @@ body {
 }
 
 .scraped-article-title {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     margin: 0 0 1rem 0;
     font-size: 1.25rem;
-    font-weight: 500;
-    line-height: 1.4;
+    font-weight: 800;
+    color: #000000;
+    line-height: 1.5;
+    letter-spacing: -0.02em;
 }
 
 .scraped-article-title a {
@@ -1576,8 +1600,8 @@ body {
 
 .article-content h3 {
     font-size: 1.5rem;
-    font-weight: 600;
-    color: #374151;
+    font-weight: 800;
+    color: #000000;
     margin: 1.5rem 0 0.75rem 0;
 }
 
