@@ -30,16 +30,17 @@ async function getSmartContent(): Promise<{ posts: Post[], sections: Section[], 
 
   // Implement the same smart content logic as the API
   const posts = allPosts || []
-  const sectionThresholds = {
-    'ma': 5,  // M&A section threshold
-    'lbo': 3,
-    'reg': 3,
-    'cap': 3,
-    'rumor': 3,
-    'all': 20
-  }
+    const sectionThresholds = {
+      'ma': 5,  // M&A section threshold
+      'lbo': 3,  // Now uses PE Wire scraper instead of RSS feeds
+      'reg': 3,
+      'cap': 3,
+      'rumor': 3,
+      'written': 3,  // Custom articles section
+      'all': 20
+    }
 
-  const cutoffTime = new Date(Date.now() - 6 * 60 * 60 * 1000) // 6 hours ago
+  const cutoffTime = new Date(Date.now() - 24 * 60 * 60 * 1000) // 24 hours ago
   
   // Group posts by section
   const postsBySection: { [key: string]: any[] } = {}
@@ -69,18 +70,24 @@ async function getSmartContent(): Promise<{ posts: Post[], sections: Section[], 
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     })
     
-    // Filter for recent posts (last 6 hours) from sorted list
+    // Always include scraped content regardless of age
+    const scrapedPosts = sortedPosts.filter(post => post.scraped_content)
+    
+    // Filter for recent posts (last 24 hours) from non-scraped posts
     const recentPosts = sortedPosts.filter(post => 
-      new Date(post.created_at) > cutoffTime
+      !post.scraped_content && new Date(post.created_at) > cutoffTime
     )
     
-    if (recentPosts.length >= threshold) {
-      // Use recent posts if we have enough
-      smartContent[sectionSlug] = recentPosts.slice(0, threshold)
+    // Combine scraped posts with recent posts, prioritizing scraped content
+    const combinedPosts = [...scrapedPosts, ...recentPosts]
+    
+    if (combinedPosts.length >= threshold) {
+      // Use combined posts if we have enough
+      smartContent[sectionSlug] = combinedPosts.slice(0, threshold)
     } else {
-      // Not enough recent posts - use the best available posts to fill to threshold
+      // Not enough posts - fill with best available posts
       const needed = threshold
-      const availablePosts = sortedPosts.slice(0, needed)
+      const availablePosts = [...scrapedPosts, ...sortedPosts.filter(post => !post.scraped_content)].slice(0, needed)
       smartContent[sectionSlug] = availablePosts
     }
   }

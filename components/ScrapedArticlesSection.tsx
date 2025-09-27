@@ -6,10 +6,12 @@ interface ScrapedArticlesSectionProps {
 }
 
 export default function ScrapedArticlesSection({ posts }: ScrapedArticlesSectionProps) {
-  // Filter posts that have scraped content
-  const scrapedPosts = posts.filter(post => post.scraped_content && post.article_slug)
+  // Filter posts that are custom admin articles only (not SEC or PE Wire)
+  const customPosts = posts.filter(post => 
+    post.origin_type === 'CUSTOM' && post.article_slug
+  )
   
-  if (scrapedPosts.length === 0) {
+  if (customPosts.length === 0) {
     return null
   }
 
@@ -24,14 +26,14 @@ export default function ScrapedArticlesSection({ posts }: ScrapedArticlesSection
   return (
     <section className="scraped-articles-section">
       <div className="section-header">
-        <h2 className="section-title">📰 Written Articles</h2>
+        <h2 className="section-title">📝 Custom Articles</h2>
         <p className="section-description">
-          In-house articles for detailed analysis of US financial moves
+          Hand-crafted articles and analysis by our editorial team
         </p>
       </div>
       
       <div className="scraped-articles-grid">
-        {scrapedPosts.slice(0, 3).map((post) => (
+        {customPosts.slice(0, 3).map((post) => (
           <article key={post.id} className="scraped-article-card">
             <div className="scraped-article-content">
               <div className="scraped-article-meta">

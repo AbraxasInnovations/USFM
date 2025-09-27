@@ -149,7 +149,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               </div>
             )}
             
-            <h1 className="text-3xl md:text-5xl font-extrabold text-black mb-8 leading-tight text-center" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', letterSpacing: '-0.02em' }}>
+            <h1 className="text-3xl md:text-5xl font-extrabold text-black mb-8 leading-tight text-center" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', letterSpacing: '-0.02em', marginTop: '4rem' }}>
               {article.title}
             </h1>
             
@@ -160,7 +160,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             </div>
             
             {article.summary && (
-              <div className="bg-gray-50 border-l-4 border-blue-500 p-8 mb-12 rounded-r-lg">
+              <div className="bg-gray-50 border-l-4 border-blue-500 p-8 mb-12 rounded-r-lg" style={{ marginTop: '2rem' }}>
                 <p className="text-lg text-gray-800 leading-relaxed font-medium">
                   {article.summary}
                 </p>
@@ -170,7 +170,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
           {/* Article Content - Newsletter Style Typography */}
           {article.scraped_content && (
-            <div className="article-content mb-20">
+            <div className="article-content mb-20" style={{ marginTop: '2rem' }}>
               <div 
                 className="prose prose-lg max-w-none text-gray-800 leading-relaxed"
                 style={{

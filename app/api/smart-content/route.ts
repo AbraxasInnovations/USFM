@@ -29,10 +29,11 @@ export async function GET(request: NextRequest) {
     // Smart content management logic
     const sectionThresholds = {
       'ma': 5,  // Increased from 3 to 5 to preserve more M&A history
-      'lbo': 3,
+      'lbo': 3,  // Now uses PE Wire scraper instead of RSS feeds
       'reg': 3,
       'cap': 3,
       'rumor': 3,
+      'written': 3,  // Custom articles section
       'all': 20
     }
 

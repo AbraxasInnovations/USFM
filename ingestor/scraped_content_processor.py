@@ -51,21 +51,21 @@ class ScrapedContentProcessor:
                     article_slug = self._generate_slug(article['title'])
                     
                     # Create content hash for deduplication
-                    content_hash = self._create_content_hash(article['title'], rewritten_content)
+                    content_hash = self._create_content_hash(article['title'], rewritten_content.get('content', ''))
                     
                     # Process into post format
                     post_data = {
-                        'title': article['title'],
-                        'summary': self._extract_summary(rewritten_content),
-                        'excerpt': self._extract_excerpt(rewritten_content),
+                        'title': rewritten_content.get('title', article['title']),
+                        'summary': self._extract_summary(rewritten_content.get('content', '')),
+                        'excerpt': self._extract_excerpt(rewritten_content.get('content', '')),
                         'source_name': article['source_name'],
                         'source_url': article['url'],
-                        'section_slug': self._classify_section(article['title'], rewritten_content),
-                        'tags': self._extract_tags(article['title'], rewritten_content),
+                        'section_slug': self._classify_section(article['title'], rewritten_content.get('content', '')),
+                        'tags': self._extract_tags(article['title'], rewritten_content.get('content', '')),
                         'status': 'published',
                         'origin_type': 'SCRAPED',
                         'image_url': article.get('image_url'),
-                        'scraped_content': rewritten_content,
+                        'scraped_content': rewritten_content.get('content', ''),
                         'article_slug': article_slug,
                         'content_hash': content_hash
                     }

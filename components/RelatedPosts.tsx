@@ -27,10 +27,7 @@ export default function RelatedPosts({ currentPost, relatedPosts }: RelatedPosts
           <article key={post.id} className="related-post-card">
             <div className="related-post-content">
               <div className="related-post-meta mb-2">
-                <span className="text-xs font-medium text-blue-600 uppercase tracking-wide">
-                  {post.section_slug}
-                </span>
-                <span className="text-xs text-gray-500 ml-2">
+                <span className="text-xs text-gray-500">
                   {formatDate(post.created_at)}
                 </span>
               </div>

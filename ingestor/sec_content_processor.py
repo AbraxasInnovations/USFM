@@ -74,7 +74,7 @@ class SECContentProcessor:
                         continue
                     
                     # Step 4.6: Check if we've already written about this company recently (within last 7 days)
-                    company_name = original_filing.get('company_name', '').lower().strip()
+                    company_name = filing.get('company_name', '').lower().strip()
                     if company_name and self._has_recent_company_article(company_name, days_back=7):
                         logger.info(f"Already wrote about {company_name} recently, skipping to avoid repetition")
                         continue
@@ -133,14 +133,14 @@ class SECContentProcessor:
                 tags.append('merger')
             
             # Generate slug
-            article_slug = self._generate_slug(rewritten_data['title'])
+            article_slug = self._generate_slug(rewritten_data['title'], filing_content['url'])
             
             # Prepare post data
             post_data = {
                 'title': rewritten_data['title'],
                 'summary': rewritten_data['summary'],
                 'excerpt': excerpt,
-                'source_name': 'SEC EDGAR',
+                'source_name': 'USFM',
                 'source_url': filing_content['url'],
                 'section_slug': section_slug,
                 'tags': tags,
@@ -160,16 +160,24 @@ class SECContentProcessor:
             logger.error(f"Error processing filing data: {e}")
             return None
 
-    def _generate_slug(self, title: str) -> str:
-        """Generate URL-friendly slug from title"""
-        # Convert to lowercase
-        slug = title.lower()
-        # Replace non-alphanumeric characters with hyphens
-        slug = re.sub(r'[^a-z0-9\s-]', '', slug)
-        # Replace spaces and multiple hyphens with a single hyphen
-        slug = re.sub(r'[\s-]+', '-', slug).strip('-')
-        # Add sec prefix to make it unique
-        slug = f"sec-{slug}"
+    def _generate_slug(self, title: str, url: str = None) -> str:
+        """Generate unique URL-friendly slug from title"""
+        # Clean and convert to slug
+        slug = re.sub(r'[^\w\s-]', '', title.lower())
+        slug = re.sub(r'[-\s]+', '-', slug)
+        slug = slug.strip('-')
+        
+        # Limit length
+        if len(slug) > 40:  # Reduced to leave room for uniqueness suffix
+            slug = slug[:40].rstrip('-')
+        
+        # Add uniqueness suffix using URL hash if provided
+        if url:
+            url_hash = hashlib.md5(url.encode()).hexdigest()[:8]
+            slug = f"sec-{slug}-{url_hash}"
+        else:
+            slug = f"sec-{slug}"
+        
         return slug
 
     def _deduplicate_filings_by_accession(self, filings: List[Dict]) -> List[Dict]:

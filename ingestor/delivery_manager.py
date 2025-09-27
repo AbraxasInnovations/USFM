@@ -40,8 +40,8 @@ class DeliveryManager:
         origin_type = post_data.get('origin_type', '').upper()
         
         # Determine the URL to use
-        if origin_type == 'SCRAPED' and post_data.get('article_slug'):
-            # For SEC rewritten articles, link to our website
+        if post_data.get('article_slug'):
+            # For rewritten articles (SEC and PE Wire), link to our website
             url = f"https://usfinancemoves.com/article/{post_data['article_slug']}"
         else:
             # For other content, use original source URL
@@ -100,23 +100,19 @@ class DeliveryManager:
         if not self.x_enabled:
             return False
             
-        title = post_data.get('title', '').lower()
-        section = post_data.get('section_slug', '').lower()
         origin_type = post_data.get('origin_type', '').upper()
-        source_name = post_data.get('source_name', '').lower()
+        article_slug = post_data.get('article_slug')
         
-        # Only tweet high-priority content:
+        # Only tweet rewritten articles with article_slug (not RSS feeds):
         # 1. SEC rewritten articles (SCRAPED origin type with article_slug)
-        if (origin_type == 'SCRAPED' and 
-            post_data.get('article_slug') and 
-            any(keyword in title for keyword in ['merger', 'acquisition', 's-4', 'filing', 'sec'])):
+        if origin_type == 'SCRAPED' and article_slug:
             return True
             
-        # 2. Private Equity Wire content
-        if 'private equity wire' in source_name:
+        # 2. PE Wire rewritten articles (PEWIRE origin type with article_slug)
+        if origin_type == 'PEWIRE' and article_slug:
             return True
             
-        # Skip everything else to conserve free tier limits
+        # Skip everything else (RSS feeds, articles without slugs, etc.)
         return False
     
     def send_web_revalidation(self, paths: List[str]) -> bool:

@@ -84,26 +84,7 @@ CONTENT_SOURCES = {
             'tags': ['business', 'regulatory', 'antitrust']
         }
     ],
-    'lbo_pe': [
-        {
-            'name': 'PE Hub',
-            'url': 'https://www.pehub.com/feed/',
-            'section': 'lbo',
-            'tags': ['private-equity', 'lbo', 'buyout', 'pe']
-        },
-        {
-            'name': 'Private Equity Wire',
-            'url': 'https://www.privateequitywire.co.uk/rss.xml',
-            'section': 'lbo',
-            'tags': ['private-equity', 'lbo', 'buyout', 'pe']
-        },
-        {
-            'name': 'MarketWatch - Business',
-            'url': 'https://feeds.marketwatch.com/marketwatch/business/',
-            'section': 'lbo',
-            'tags': ['private-equity', 'lbo', 'buyout', 'business']
-        }
-    ],
+    # LBO/PE section now uses PE Wire scraper instead of RSS feeds
     'altcoin_news': [
         {
             'name': 'Cointelegraph - Altcoin News',

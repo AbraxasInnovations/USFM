@@ -153,24 +153,27 @@ body {
 }
 
 .compact-logo .logo-main {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 700;
     color: #00bfff;
     letter-spacing: normal;
+    line-height: 1;
 }
 
 .compact-logo .logo-financial {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     font-weight: 700;
     color: #00bfff;
     letter-spacing: normal;
+    line-height: 1;
 }
 
 .compact-logo .logo-moves {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     font-weight: 700;
     color: #000000;
     letter-spacing: normal;
+    line-height: 1;
 }
 
 .compact-nav ul {
@@ -1293,14 +1296,17 @@ body {
     
     .compact-logo .logo-main {
         font-size: 1.2rem;
+        line-height: 1;
     }
     
     .compact-logo .logo-financial {
-        font-size: 1rem;
+        font-size: 1.2rem;
+        line-height: 1;
     }
     
     .compact-logo .logo-moves {
-        font-size: 0.9rem;
+        font-size: 1.2rem;
+        line-height: 1;
     }
     
     .compact-nav a {
@@ -1565,11 +1571,11 @@ body {
 }
 
 .related-post-title a {
-    color: #1f2937;
+    color: #1a1a1a;
     text-decoration: none;
-    font-size: 1.125rem;
-    font-weight: 600;
-    line-height: 1.4;
+    font-size: 1.3rem;
+    font-weight: 500;
+    line-height: 1.3;
     transition: color 0.2s ease;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -1647,6 +1653,19 @@ body {
     }
 }
 
+/* Tablet and smaller mobile styles */
+@media (max-width: 768px) {
+    /* Footer adjustments for tablets and mobile */
+    footer .grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem !important;
+    }
+    
+    footer .col-span-1 {
+        margin-bottom: 1rem !important;
+    }
+}
+
 /* Mobile styles */
 @media (max-width: 480px) {
     .logo {
@@ -1678,8 +1697,78 @@ body {
         font-size: 0.9rem;
     }
     
+    .related-post-title a {
+        font-size: 1.1rem;
+    }
+    
     .container {
         padding: 0 10px;
+    }
+    
+    /* Mobile Footer Styles */
+    footer {
+        padding: 1rem 0.5rem !important;
+    }
+    
+    footer .w-full {
+        padding: 0.5rem !important;
+    }
+    
+    footer h3 {
+        font-size: 1rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    footer h4 {
+        font-size: 0.875rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    footer p {
+        font-size: 0.75rem !important;
+        line-height: 1.4 !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    footer ul {
+        margin-bottom: 1rem !important;
+    }
+    
+    footer li {
+        margin-bottom: 0.25rem !important;
+    }
+    
+    footer a {
+        font-size: 0.75rem !important;
+    }
+    
+    footer .text-xs {
+        font-size: 0.625rem !important;
+    }
+    
+    footer .grid {
+        gap: 1rem !important;
+    }
+    
+    footer .border-t {
+        margin-top: 1rem !important;
+        padding-top: 0.75rem !important;
+    }
+    
+    footer .flex-col {
+        gap: 0.5rem !important;
+    }
+    
+    /* Ensure text doesn't overflow horizontally */
+    footer * {
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        max-width: 100% !important;
+    }
+    
+    /* Specific adjustments for long text */
+    footer p {
+        word-break: break-word !important;
     }
 }
 

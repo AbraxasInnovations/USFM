@@ -19,7 +19,7 @@ export interface Post {
   tags: string[]
   content_hash: string
   status: 'published' | 'hidden'
-  origin_type: 'SEC' | 'USGOV' | 'PRESS' | 'MEDIA' | 'RUMOR' | 'SCRAPED' | 'CRYPTO'
+  origin_type: 'SEC' | 'USGOV' | 'PRESS' | 'MEDIA' | 'RUMOR' | 'SCRAPED' | 'CRYPTO' | 'CUSTOM' | 'PEWIRE'
   image_url: string | null
   scraped_content: string | null
   article_slug: string | null

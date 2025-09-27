@@ -14,8 +14,10 @@ from database import DatabaseManager
 from feed_reader import FeedReader
 from content_processor import ContentProcessor
 from delivery_manager import DeliveryManager
-from scraped_content_processor import ScrapedContentProcessor
+# WealthSpire scraper import removed - no longer neededyes
 from sec_content_processor import SECContentProcessor
+from pe_wire_content_processor import PEWireContentProcessor
+from pe_wire_scraper import PEWireScraper
 from smart_content_manager import SmartContentManager
 
 # Configure logging
@@ -36,8 +38,10 @@ class NewsIngestor:
         self.feed_reader = FeedReader()
         self.content_processor = ContentProcessor()
         self.delivery_manager = DeliveryManager()
-        self.scraped_processor = ScrapedContentProcessor()
+        # WealthSpire scraper removed - no longer needed
         self.sec_processor = SECContentProcessor()
+        self.pe_wire_processor = PEWireContentProcessor()
+        self.pe_wire_scraper = PEWireScraper()
         self.smart_content_manager = SmartContentManager()
         
         # Statistics
@@ -46,8 +50,9 @@ class NewsIngestor:
             'entries_fetched': 0,
             'posts_created': 0,
             'posts_skipped': 0,
-            'scraped_articles': 0,
+            # WealthSpire articles removed
             'sec_filings': 0,
+            'pe_wire_articles': 0,
             'fallback_articles_used': 0,
             'errors': 0
         }
@@ -193,8 +198,9 @@ class NewsIngestor:
         logger.info(f"Entries fetched: {self.stats['entries_fetched']}")
         logger.info(f"Posts created: {self.stats['posts_created']}")
         logger.info(f"Posts skipped: {self.stats['posts_skipped']}")
-        logger.info(f"Scraped articles: {self.stats['scraped_articles']}")
+        # WealthSpire articles removed
         logger.info(f"SEC S-4 filings: {self.stats['sec_filings']}")
+        logger.info(f"PE Wire articles: {self.stats['pe_wire_articles']}")
         logger.info(f"Fallback articles used: {self.stats['fallback_articles_used']}")
         logger.info(f"Errors: {self.stats['errors']}")
         
@@ -222,16 +228,7 @@ class NewsIngestor:
                 logger.warning("No posts created from entries")
                 return
             
-            # Process scraped content (WealthSpire)
-            logger.info("Processing scraped content from WealthSpire...")
-            scraped_posts = self.scraped_processor.process_wealthspire_articles(max_articles=2)
-            
-            if scraped_posts:
-                logger.info(f"Successfully processed {len(scraped_posts)} scraped articles")
-                posts.extend(scraped_posts)
-                self.stats['scraped_articles'] = len(scraped_posts)
-            else:
-                logger.warning("No scraped articles processed")
+            # WealthSpire processing removed - no longer needed
             
             # Process SEC S-4 filings
             logger.info("Processing SEC S-4 filings...")
@@ -243,6 +240,22 @@ class NewsIngestor:
                 self.stats['sec_filings'] = len(sec_posts)
             else:
                 logger.warning("No SEC S-4 filings processed")
+            
+            # Process Private Equity Wire articles
+            logger.info("Processing Private Equity Wire articles...")
+            pe_wire_articles = self.pe_wire_scraper.get_articles_with_content(days_back=7, max_articles=3)
+            
+            if pe_wire_articles:
+                pe_wire_posts = self.pe_wire_processor.process_articles(pe_wire_articles)
+                
+                if pe_wire_posts:
+                    logger.info(f"Successfully processed {len(pe_wire_posts)} PE Wire articles")
+                    posts.extend(pe_wire_posts) # Add PE Wire posts to the main list
+                    self.stats['pe_wire_articles'] = len(pe_wire_posts)
+                else:
+                    logger.warning("No PE Wire articles processed")
+            else:
+                logger.warning("No PE Wire articles found")
             
             # Store posts in database
             stored_posts = self.store_posts(posts)
@@ -267,8 +280,10 @@ class NewsIngestor:
             self.db.close()
             self.feed_reader.close()
             self.content_processor.close()
-            self.scraped_processor.close()
+            # WealthSpire scraper cleanup removed
             self.sec_processor.close()
+            self.pe_wire_processor.close()
+            self.pe_wire_scraper.close()
             self.smart_content_manager.close()
 
 def main():
