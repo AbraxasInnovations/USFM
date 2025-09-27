@@ -1319,6 +1319,10 @@ body {
         padding: 0 1rem;
     }
     
+    .carousel-banner {
+        padding: 0.3rem 0 !important;
+    }
+    
     .compact-logo .logo-main {
         font-size: 1.2rem;
         line-height: 1;
@@ -1777,7 +1781,7 @@ body {
     
     /* Make US Finance Moves title much smaller on mobile */
     footer h3 {
-        font-size: 0.9rem !important;
+        font-size: 0.7rem !important;
         margin-bottom: 0.5rem !important;
         word-wrap: break-word !important;
         line-height: 1.2 !important;
