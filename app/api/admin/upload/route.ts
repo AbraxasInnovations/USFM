@@ -4,13 +4,13 @@ import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { revalidatePath } from 'next/cache'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 export async function POST(request: NextRequest) {
   try {
+    // Create Supabase client inside the function to avoid build-time issues
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
     // Basic authentication check (you can enhance this later)
     const authHeader = request.headers.get('authorization')
     const expectedAuth = process.env.ADMIN_PASSWORD

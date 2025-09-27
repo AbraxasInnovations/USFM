@@ -99,7 +99,7 @@ export default function RootLayout({
                   </li>
                   <li style={{marginBottom: '12px'}}>
                     <a href="/section/rumor" style={{fontSize: '15px', color: '#6b7280', textDecoration: 'none', transition: 'color 0.2s'}}>
-                      Rumors & Watchlist
+                      DeFi/Crypto
                     </a>
                   </li>
                 </ul>

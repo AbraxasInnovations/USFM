@@ -18,7 +18,7 @@ class SmartContentManager:
             'lbo': 3,     # LBO/Private Equity  
             'reg': 3,     # Regulatory/Antitrust
             'cap': 5,     # Capital Markets (most important)
-            'rumor': 2,   # Rumors/Watchlist
+            'rumor': 2,   # DeFi/Crypto
             'all': 30     # Homepage total
         }
         

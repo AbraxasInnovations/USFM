@@ -224,6 +224,14 @@ body {
     padding: 0 2rem;
 }
 
+.carousel-text-secondary {
+    margin-left: 12rem;
+}
+
+.carousel-text-tertiary {
+    margin-left: 12rem;
+}
+
 @keyframes scroll {
     0% {
         transform: translateX(100%);

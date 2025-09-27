@@ -6,7 +6,7 @@ A comprehensive US Finance Deal Feed platform featuring real-time news ingestion
 
 ### Frontend
 - **Morning Brew Style Layout**: Featured article + top headlines
-- **Section-Based Navigation**: M&A, LBO/PE, Regulatory, Capital Markets, Rumors
+- **Section-Based Navigation**: M&A, LBO/PE, Regulatory, Capital Markets, DeFi/Crypto
 - **Global Search**: Server-side search across titles, summaries, and tags
 - **Tag-Based Filtering**: Clickable tags for content discovery
 - **Archive System**: Paginated browsing of older posts

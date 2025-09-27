@@ -43,7 +43,7 @@ export default function Footer() {
               </li>
               <li>
                 <a href="/section/rumor" className="text-sm text-gray-300 hover:text-white transition-colors">
-                  Rumors & Watchlist
+                  DeFi/Crypto
                 </a>
               </li>
             </ul>

@@ -88,6 +88,12 @@ export default function Header({ sections }: HeaderProps) {
           <span className="carousel-text">
             Breaking news in finance without breaking open the wallet -- information democratized 💸
           </span>
+          <span className="carousel-text carousel-text-secondary">
+            Your source for the biggest moves in LBO, PE, M&A, and Wealth Management
+          </span>
+          <span className="carousel-text carousel-text-tertiary">
+            Follow us on Twitter for finance moves delivered straight to your home feed -- Enable notifications for real-time alerts straight to your home screen
+          </span>
         </div>
       </div>
     </>
