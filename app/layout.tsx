@@ -1,11 +1,18 @@
 import type { Metadata } from 'next'
-import { Oswald } from 'next/font/google'
+import { Oswald, Playfair_Display } from 'next/font/google'
 import './globals.css'
 
 const oswald = Oswald({
   weight: '500',
   subsets: ['latin'],
   display: 'swap',
+})
+
+const playfairDisplay = Playfair_Display({
+  weight: ['400', '500', '600', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-reckless',
 })
 
 export const metadata: Metadata = {
@@ -38,7 +45,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         ></script>
       </head>
-      <body className={oswald.className}>
+      <body className={`${oswald.className} ${playfairDisplay.variable}`}>
         {children}
         <footer style={{
           backgroundColor: '#f8f9fa',

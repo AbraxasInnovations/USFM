@@ -31,6 +31,7 @@ export default function TopHeadlines({ posts }: TopHeadlinesProps) {
               </h4>
               <div className="headline-meta">
                 <span className="headline-source">{post.source_name}</span>
+                <span className="headline-separator"> | </span>
                 <span className="headline-time">{formatTime(post.created_at)}</span>
               </div>
             </div>

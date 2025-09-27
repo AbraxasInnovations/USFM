@@ -149,7 +149,7 @@ body {
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.2rem;
 }
 
 .compact-logo .logo-main {
@@ -158,6 +158,7 @@ body {
     color: #00bfff;
     letter-spacing: normal;
     line-height: 1;
+    transform: translateY(-0.25px);
 }
 
 .compact-logo .logo-financial {
@@ -438,9 +439,9 @@ body {
 }
 
 .featured-title {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: var(--font-reckless);
     font-size: 2.2rem;
-    font-weight: 800;
+    font-weight: 700;
     color: #000000;
     margin-bottom: 1rem;
     line-height: 1.5;
@@ -458,10 +459,12 @@ body {
 }
 
 .featured-summary {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 1.1rem;
     color: #555;
     margin-bottom: 1.5rem;
     line-height: 1.6;
+    font-weight: 400;
 }
 
 .featured-excerpt {
@@ -536,8 +539,9 @@ body {
 }
 
 .headlines-title {
+    font-family: var(--font-reckless);
     font-size: 1.5rem;
-    font-weight: 500;
+    font-weight: 800;
     color: #1a1a1a;
     margin-bottom: 1.5rem;
     border-bottom: 2px solid #e5e5e5;
@@ -607,6 +611,11 @@ body {
     color: #666;
 }
 
+.headline-separator {
+    color: #999;
+    font-weight: 300;
+}
+
 .headline-source {
     font-weight: 500;
 }
@@ -641,8 +650,9 @@ body {
 }
 
 .section-title {
+    font-family: var(--font-reckless);
     font-size: 2rem;
-    font-weight: 500;
+    font-weight: 800;
     color: #1a1a1a;
     margin-bottom: 2rem;
     border-bottom: 2px solid #e5e5e5;
@@ -662,6 +672,9 @@ body {
     overflow: hidden;
     transition: all 0.3s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .article-card:hover {
@@ -682,6 +695,9 @@ body {
 
 .article-content {
     padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
 .article-title {
@@ -717,6 +733,7 @@ body {
     align-items: center;
     font-size: 0.8rem;
     color: #999;
+    margin-top: auto;
 }
 
 .article-source {
@@ -1305,6 +1322,7 @@ body {
     .compact-logo .logo-main {
         font-size: 1.2rem;
         line-height: 1;
+        transform: translateY(-0.25px);
     }
     
     .compact-logo .logo-financial {
@@ -1736,71 +1754,82 @@ body {
     
     /* Enhanced Mobile Footer Styles */
     footer {
-        padding: 1rem 0.75rem !important;
+        padding: 1rem 0.5rem !important;
         overflow-x: hidden !important;
     }
     
     footer .w-full {
-        padding: 0.5rem !important;
+        padding: 0.25rem !important;
         max-width: 100vw !important;
         overflow-x: hidden !important;
     }
     
     footer .grid {
         grid-template-columns: 1fr !important;
-        gap: 1.5rem !important;
+        gap: 1rem !important;
         max-width: 100% !important;
     }
     
     footer .col-span-1 {
-        margin-bottom: 1rem !important;
+        margin-bottom: 0.75rem !important;
         max-width: 100% !important;
     }
     
+    /* Make US Finance Moves title much smaller on mobile */
     footer h3 {
-        font-size: 1.1rem !important;
-        margin-bottom: 0.75rem !important;
-        word-wrap: break-word !important;
-    }
-    
-    footer h4 {
         font-size: 0.9rem !important;
         margin-bottom: 0.5rem !important;
+        word-wrap: break-word !important;
+        line-height: 1.2 !important;
     }
     
-    footer p {
+    /* Make section headers smaller */
+    footer h4 {
         font-size: 0.8rem !important;
-        line-height: 1.4 !important;
-        margin-bottom: 0.75rem !important;
+        margin-bottom: 0.4rem !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Make description text much smaller and more compact */
+    footer p {
+        font-size: 0.7rem !important;
+        line-height: 1.3 !important;
+        margin-bottom: 0.5rem !important;
         word-wrap: break-word !important;
         overflow-wrap: break-word !important;
         hyphens: auto !important;
     }
     
+    /* Make lists more compact */
     footer ul {
-        margin-bottom: 1rem !important;
+        margin-bottom: 0.75rem !important;
     }
     
     footer li {
-        margin-bottom: 0.25rem !important;
+        margin-bottom: 0.2rem !important;
     }
     
+    /* Make links smaller */
     footer a {
-        font-size: 0.8rem !important;
-        word-wrap: break-word !important;
-    }
-    
-    footer .text-xs {
         font-size: 0.7rem !important;
+        word-wrap: break-word !important;
+        line-height: 1.2 !important;
     }
     
+    /* Make copyright text smaller */
+    footer .text-xs {
+        font-size: 0.6rem !important;
+        line-height: 1.2 !important;
+    }
+    
+    /* Reduce spacing in bottom bar */
     footer .border-t {
-        margin-top: 1rem !important;
-        padding-top: 0.75rem !important;
+        margin-top: 0.75rem !important;
+        padding-top: 0.5rem !important;
     }
     
     footer .flex-col {
-        gap: 0.5rem !important;
+        gap: 0.4rem !important;
     }
     
     footer .sm\\:flex-row {
@@ -1808,7 +1837,7 @@ body {
     }
     
     footer .sm\\:mb-0 {
-        margin-bottom: 0.75rem !important;
+        margin-bottom: 0.5rem !important;
     }
     
     /* Ensure no horizontal overflow */
