@@ -1320,7 +1320,12 @@ body {
     }
     
     .carousel-banner {
-        padding: 0.3rem 0 !important;
+        padding: 0.2rem 0 !important;
+        min-height: auto !important;
+    }
+    
+    .carousel-content {
+        padding: 0.1rem 0 !important;
     }
     
     .compact-logo .logo-main {
@@ -1781,10 +1786,23 @@ body {
     
     /* Make US Finance Moves title much smaller on mobile */
     footer h3 {
-        font-size: 0.7rem !important;
-        margin-bottom: 0.5rem !important;
+        font-size: 0.6rem !important;
+        margin-bottom: 0.3rem !important;
         word-wrap: break-word !important;
+        line-height: 1.1 !important;
+    }
+    
+    /* Force footer grid to single column on mobile */
+    footer .grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.8rem !important;
+    }
+    
+    /* Make footer description much smaller */
+    footer p {
+        font-size: 0.65rem !important;
         line-height: 1.2 !important;
+        margin-bottom: 0.4rem !important;
     }
     
     /* Make section headers smaller */
