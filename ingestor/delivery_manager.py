@@ -42,7 +42,7 @@ class DeliveryManager:
         # Determine the URL to use
         if post_data.get('article_slug'):
             # For rewritten articles (SEC and PE Wire), link to our website
-            url = f"https://usfinancemoves.com/article/{post_data['article_slug']}"
+            url = f"https://www.usfinancemoves.com/article/{post_data['article_slug']}"
         else:
             # For other content, use original source URL
             url = post_data['source_url']
