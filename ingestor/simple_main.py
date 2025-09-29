@@ -3,7 +3,7 @@ Simplified news ingestor using direct API calls
 """
 import logging
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any
 
 from simple_database import SimpleDatabaseManager
@@ -64,11 +64,12 @@ def run_ingestion():
         try:
             # feedparser often provides a parsed_parsed tuple
             if isinstance(published_date, time.struct_time):
-                created_at = datetime.fromtimestamp(time.mktime(published_date)).isoformat() + "Z"
+                # Convert struct_time to UTC datetime (RSS feeds typically provide UTC)
+                created_at = datetime(*published_date[:6], tzinfo=timezone.utc).isoformat()
             else: # Assume it's a string, try to parse
-                created_at = datetime.fromisoformat(published_date.replace('Z', '+00:00')).isoformat() + "Z"
+                created_at = datetime.fromisoformat(published_date.replace('Z', '+00:00')).isoformat()
         except Exception:
-            created_at = datetime.now().isoformat() + "Z" # Fallback to now
+            created_at = datetime.now(timezone.utc).isoformat() # Fallback to now in UTC
 
         post_data = {
             'title': title,

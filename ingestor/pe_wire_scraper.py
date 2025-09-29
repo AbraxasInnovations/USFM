@@ -7,7 +7,7 @@ import requests
 import logging
 import time
 from typing import List, Dict, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import json
 import re
 from urllib.parse import urljoin, urlparse
@@ -60,16 +60,16 @@ class PEWireScraper:
                 return []
             
             articles = []
-            cutoff_date = datetime.now() - timedelta(days=days_back)
+            cutoff_date = datetime.now(timezone.utc) - timedelta(days=days_back)
             
             for entry in feed.entries[:max_articles]:
                 try:
                     # Parse publication date
                     pub_date = None
                     if hasattr(entry, 'published_parsed') and entry.published_parsed:
-                        pub_date = datetime(*entry.published_parsed[:6])
+                        pub_date = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
                     elif hasattr(entry, 'updated_parsed') and entry.updated_parsed:
-                        pub_date = datetime(*entry.updated_parsed[:6])
+                        pub_date = datetime(*entry.updated_parsed[:6], tzinfo=timezone.utc)
                     
                     # Skip if article is too old
                     if pub_date and pub_date < cutoff_date:
