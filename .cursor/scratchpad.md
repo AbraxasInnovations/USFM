@@ -416,3 +416,97 @@ Transform the static finance news site into a comprehensive US Finance Deal Feed
 2. Consider adjusting the 7-day company repetition window based on content volume
 3. Test with live SEC data to ensure all deduplication layers work correctly
 4. Consider adding more sophisticated company name matching (e.g., "Fossil Group" vs "Fossil Group Inc.")
+
+### SEO Strategy & Multi-Site Integration
+
+**Role:** Independent finance news brand covering M&A, PE, LBOs, policy/regulation, and local firm moves.
+
+**Owner Disclosure:** Do not mention Abraxas Innovations anywhere.
+
+**Primary Goals:**
+- Be the canonical/origin for news articles
+- Build topical authority and earn backlinks
+- Funnel readers to subscribe (Substack) and recognize author = Derek Pethel
+
+**Content & Routing Strategy:**
+- **Sections (directories and nav):** `/markets/`, `/deals/`, `/private-equity/`, `/local/`, `/policy/`, `/opinion/`
+- **Article URLs:** `/deals/ohio-spv-acquires-5m-refund-rights/` (lowercase, hyphenated slugs)
+- **Internal links:** Each article links to 1–2 older related USFM posts ("related reading")
+
+**Linking Rules (Critical):**
+- Link to DerekPethel.com as author profile only
+- Anchor: "By Derek Pethel" → https://derekpethel.com/press or author page
+- Never link to AbraxasInnovations.com or ABXInnovate.com
+- External backlinks should use anchors like:
+  - "as reported by US Finance Moves"
+  - "according to USFM's coverage of [topic]"
+
+**SEO & Schema Implementation:**
+- Every article includes NewsArticle JSON-LD and site includes Organization JSON-LD
+- Title format: `[[Specific Headline]] | US Finance Moves`
+- Meta description: 150–160 chars, keyword + location if relevant
+- OpenGraph/Twitter cards set per post
+- Canonicals & Sitemaps: Each post canonical to itself (USFM is origin)
+- Maintain `/sitemap.xml` and rolling `/news-sitemap.xml` (last 48h)
+
+**Performance & Quality Targets:**
+- Target <2s LCP (Largest Contentful Paint)
+- Brotli/GZIP compression, image width/height, lazy-load, preconnect fonts
+- Security headers: HSTS, X-Content-Type-Options, X-Frame-Options, basic CSP
+
+**Substack/Medium Flow (from USFM side):**
+- Provide excerpt HTML to Substack
+- Provide repost markdown to Medium with rel=canonical back to USFM
+
+**CI "Blockers" (must pass):**
+- Lint: titles (≤60 chars), meta description present, H1 matches headline
+- Required JSON-LD present & valid
+- Canonical present
+- At least 1 internal link to prior USFM content
+- OG/Twitter images exist and are the right size
+
+**Implementation Priority:**
+1. **High Priority:** JSON-LD schema implementation for all articles
+2. **High Priority:** Proper canonical URLs and sitemap generation
+3. **Medium Priority:** Performance optimization (LCP <2s)
+4. **Medium Priority:** Security headers implementation
+5. **Low Priority:** Substack/Medium integration workflow
+
+### Content Strategy & Author Attribution
+
+**Author Strategy for USFM Articles:**
+- **Use pen name** for USFM articles (e.g., "Alex Morgan", "Jordan Chen", "Casey Williams")
+- **Link to derekpethel.com/press** for "press mentions" (not author attribution)
+- **Purpose**: Build USFM as independent finance news brand
+
+**Business Brand Recognition Strategy:**
+- **Mention "Abraxas Innovations, headed by Derek Pethel"** in relevant articles
+- **Example**: "Abraxas Innovations, headed by Derek Pethel, has not issued public statements and could not be reached for comment."
+- **SEO Benefits**: 
+  - "Derek Pethel" appears in search results for Abraxas-related queries
+  - Establishes you as leader of significant business ventures
+  - Creates natural linking between business activities and personal brand
+  - Sets up future press coverage about Derek Pethel's business moves
+
+**Cross-Site SEO Strategy:**
+- **USFM**: Independent finance news with pen name attribution
+- **Derek Pethel**: Business leader getting recognition through business activities
+- **Abraxas**: Company making moves (gets coverage, you get credit as leader)
+- **Key Rule**: Don't mention USFM on Abraxas site, but do mention Derek Pethel as Abraxas leader in USFM articles
+
+**Content Attribution Format:**
+```
+**By [Pen Name]** | [derekpethel.com/press](https://derekpethel.com/press)
+```
+
+**Business Mention Format:**
+```
+"Abraxas Innovations, headed by Derek Pethel, has not issued public statements and could not be reached for comment."
+```
+
+**SEO Benefits of This Approach:**
+- Clean separation between business entities
+- USFM builds independent authority
+- Derek Pethel gets recognition through actual business activities
+- Natural search result real estate for your name
+- Authority signals showing you're leading significant ventures
