@@ -16,7 +16,6 @@ async function getSmartContent(): Promise<{ posts: Post[], sections: Section[], 
     .select('*')
     .eq('status', 'published')
     .order('created_at', { ascending: false })
-    .limit(100)
 
   const { data: sections, error: sectionsError } = await supabase
     .from('sections')
