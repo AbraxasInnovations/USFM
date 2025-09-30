@@ -79,6 +79,12 @@ class SECContentProcessor:
                         logger.info(f"Already wrote about {company_name} recently, skipping to avoid repetition")
                         continue
                     
+                    # Step 4.7: Check if slug already exists (additional safety check)
+                    article_slug = self._generate_slug(rewritten_data['title'], filing_content['url'])
+                    if self._slug_exists(article_slug):
+                        logger.warning(f"Slug already exists, skipping: {article_slug}")
+                        continue
+                    
                     # Step 5: Process for our system
                     processed_filing = self._process_filing_data(
                         original_filing=filing,
@@ -214,6 +220,15 @@ class SECContentProcessor:
         # Return the full URL path
         return f"/images/sec/{selected_image}"
     
+    def _slug_exists(self, slug: str) -> bool:
+        """Check if a slug already exists in the database"""
+        try:
+            result = self.db.supabase.table('posts').select('id').eq('article_slug', slug).execute()
+            return len(result.data) > 0
+        except Exception as e:
+            logger.error(f"Error checking if slug exists: {e}")
+            return False
+
     def _has_recent_company_article(self, company_name: str, days_back: int = 7) -> bool:
         """
         Check if we've already written about this company recently
