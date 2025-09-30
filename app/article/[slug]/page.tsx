@@ -2,6 +2,8 @@ import { supabase } from '@/lib/supabase'
 import Header from '@/components/Header'
 import RelatedPosts from '@/components/RelatedPosts'
 import { notFound } from 'next/navigation'
+import { Metadata } from 'next'
+import Image from 'next/image'
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>
@@ -34,6 +36,59 @@ async function getSections() {
   }
 
   return sections
+}
+
+export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
+  const { slug } = await params
+  const article = await getArticle(slug)
+
+  if (!article) {
+    return {
+      title: 'Article Not Found | US Finance Moves',
+    }
+  }
+
+  const title = `${article.title} | US Finance Moves`
+  const description = article.summary || article.excerpt || article.title
+  const canonicalUrl = `https://www.usfinancemoves.com/article/${article.article_slug}`
+  const imageUrl = article.image_url || 'https://www.usfinancemoves.com/og-default.jpg'
+
+  return {
+    title,
+    description: description.length > 160 ? description.substring(0, 157) + '...' : description,
+    canonical: canonicalUrl,
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: 'US Finance Moves',
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: article.title,
+        },
+      ],
+      locale: 'en_US',
+      type: 'article',
+      publishedTime: article.created_at,
+      modifiedTime: article.updated_at || article.created_at,
+      authors: [article.source_name || 'USFM'],
+      section: article.section_slug || 'Finance',
+      tags: article.tags || [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [imageUrl],
+      creator: '@usfinancemoves',
+    },
+    alternates: {
+      canonical: canonicalUrl,
+    },
+  }
 }
 
 async function getRelatedPosts(currentPost: any, limit: number = 6) {
@@ -122,9 +177,47 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     })
   }
 
+  // Generate JSON-LD schema
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": article.title,
+    "description": article.summary || article.excerpt || article.title,
+    "datePublished": article.created_at,
+    "dateModified": article.updated_at || article.created_at,
+    "author": {
+      "@type": "Person",
+      "name": article.source_name || "USFM",
+      "url": "https://derekpethel.com/press"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "US Finance Moves",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.usfinancemoves.com/logo.png"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://www.usfinancemoves.com/article/${article.article_slug}`
+    },
+    "image": article.image_url ? [article.image_url] : [],
+    "articleSection": article.section_slug || "Finance",
+    "keywords": article.tags ? article.tags.join(", ") : "",
+    "url": `https://www.usfinancemoves.com/article/${article.article_slug}`
+  }
+
   return (
-    <div className="min-h-screen bg-white">
-      <Header sections={sections} />
+    <>
+      {/* JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      
+      <div className="min-h-screen bg-white">
+        <Header sections={sections} />
       
       <main className="container mx-auto px-4 py-8">
         <article className="max-w-4xl mx-auto bg-white shadow-sm rounded-lg p-8 md:p-12">
@@ -135,9 +228,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             {article.image_url && (
               <div className="flex justify-center items-center" style={{ marginTop: '3rem', marginBottom: '4rem', width: '100%' }}>
                 <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                  <img 
+                  <Image 
                     src={article.image_url} 
                     alt={article.title}
+                    width={800}
+                    height={400}
                     className="h-64 md:h-80 object-cover rounded-lg shadow-lg"
                     style={{ 
                       maxWidth: '800px', 
@@ -145,6 +240,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                       display: 'block',
                       margin: '0 auto'
                     }}
+                    priority
+                    sizes="(max-width: 768px) 100vw, 800px"
                   />
                 </div>
               </div>
@@ -225,7 +322,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           <RelatedPosts currentPost={article} relatedPosts={relatedPosts} />
         </article>
       </main>
-    </div>
+      </div>
+    </>
   )
 }
 

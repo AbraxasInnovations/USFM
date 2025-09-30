@@ -5,6 +5,7 @@ import feedparser
 import requests
 import logging
 import time
+from datetime import datetime, timezone
 from typing import List, Dict, Optional
 from config import REQUEST_DELAY, TIMEOUT, MAX_POSTS_PER_SOURCE
 
@@ -58,13 +59,19 @@ class FeedReader:
         for entry in feed.entries[:max_entries]:
             try:
                 # Extract entry data
+                # Fix timezone handling for published_parsed
+                published_parsed = entry.get('published_parsed')
+                if published_parsed:
+                    # Convert struct_time to UTC datetime
+                    published_parsed = datetime(*published_parsed[:6], tzinfo=timezone.utc)
+                
                 entry_data = {
                     'title': entry.get('title', ''),
                     'description': entry.get('description', ''),
                     'summary': entry.get('summary', ''),
                     'link': entry.get('link', ''),
                     'published': entry.get('published', ''),
-                    'published_parsed': entry.get('published_parsed'),
+                    'published_parsed': published_parsed,
                     'author': entry.get('author', ''),
                     'tags': [tag.get('term', '') for tag in entry.get('tags', [])],
                     'image_url': self._extract_image_url(entry)

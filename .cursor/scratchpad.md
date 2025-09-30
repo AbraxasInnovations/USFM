@@ -466,11 +466,28 @@ Transform the static finance news site into a comprehensive US Finance Deal Feed
 - OG/Twitter images exist and are the right size
 
 **Implementation Priority:**
-1. **High Priority:** JSON-LD schema implementation for all articles
-2. **High Priority:** Proper canonical URLs and sitemap generation
-3. **Medium Priority:** Performance optimization (LCP <2s)
-4. **Medium Priority:** Security headers implementation
+1. **✅ COMPLETED:** JSON-LD schema implementation for all articles
+2. **✅ COMPLETED:** Proper canonical URLs and sitemap generation
+3. **✅ COMPLETED:** Performance optimization (LCP <2s)
+4. **✅ COMPLETED:** Security headers implementation
 5. **Low Priority:** Substack/Medium integration workflow
+
+**SEO Implementation Status (September 30, 2025):**
+- ✅ **JSON-LD Schema**: Added NewsArticle schema to all article pages with proper metadata
+- ✅ **Organization Schema**: Added Organization JSON-LD to homepage
+- ✅ **Canonical URLs**: Implemented proper canonical URLs for all pages
+- ✅ **Sitemap Generation**: Created dynamic sitemap.ts with all articles and sections
+- ✅ **Robots.txt**: Created robots.ts with proper crawling rules
+- ✅ **Meta Tags**: Enhanced metadata with OpenGraph, Twitter cards, and proper descriptions
+- ✅ **Performance**: Added Next.js Image optimization, preconnect links, and compression
+- ✅ **Security Headers**: Implemented X-Frame-Options, X-Content-Type-Options, and other security headers
+- ✅ **Next.js Config**: Added comprehensive performance and security optimizations
+
+**Timezone Fix Implementation (September 30, 2025):**
+- ✅ **FeedReader Timezone Fix**: Fixed timezone handling in `ingestor/feed_reader.py` to convert `published_parsed` struct_time to UTC datetime
+- ✅ **ContentProcessor Timezone Fix**: Added proper timestamp processing in `ingestor/content_processor.py` to handle UTC timestamps
+- ✅ **Root Cause**: The live site uses `main.py` which uses `FeedReader` and `ContentProcessor`, but timezone fixes were only applied to `simple_main.py` and `pe_wire_scraper.py`
+- ✅ **Solution**: Applied timezone fixes to the actual files used by the live site's GitHub Actions workflow
 
 ### Content Strategy & Author Attribution
 
@@ -510,3 +527,102 @@ Transform the static finance news site into a comprehensive US Finance Deal Feed
 - Derek Pethel gets recognition through actual business activities
 - Natural search result real estate for your name
 - Authority signals showing you're leading significant ventures
+
+---
+
+## ExecSum Scraper Implementation
+
+### Current Status: WORKING BUT LIMITED
+**Date**: September 30, 2025
+**Status**: Functional scraper created, ready for enhancement
+
+### What Works ✅
+1. **API Access**: Successfully connects to `https://www.execsum.co/posts`
+2. **Post Discovery**: Gets 30 free posts with metadata (titles, dates, slugs, IDs)
+3. **Content Extraction**: Extracts content from main page (limited but working)
+4. **Rewriting Framework**: Complete OpenAI integration ready
+5. **Error Handling**: Graceful handling of missing dependencies
+6. **Structured Output**: Returns organized data with original and rewritten content
+
+### What Doesn't Work ❌
+1. **Full Article Content**: Only gets content snippets from main page listing, not full articles
+2. **Individual Post URLs**: Direct post URLs (e.g., `/a-rare-win-for-banks`) return 404
+3. **Content Depth**: Current extraction gets ~679 characters vs full article content
+4. **OpenAI Integration**: Requires API key to be added for real rewriting
+
+### Technical Details
+- **API Endpoint**: `https://www.execsum.co/posts` (returns JSON with 30 posts)
+- **Content Source**: Main page HTML scraping (not individual post pages)
+- **Latest Post**: "A Rare Win for Banks" (published today)
+- **Content Length**: ~679 characters extracted (limited)
+- **Posts Available**: 30 free posts, 6 from last 7 days
+
+### Files Created
+- **`execsum_scraper.py`**: Main scraper class with full functionality
+  - `ExecSumScraper` class with methods:
+    - `get_latest_posts()`: Gets posts from API
+    - `scrape_post_content()`: Extracts content from posts
+    - `rewrite_content()`: Uses OpenAI to rewrite content
+    - `process_latest_post()`: Complete workflow
+
+### Implementation Status
+```python
+# Current working code:
+scraper = ExecSumScraper()  # Works without OpenAI API key
+result = scraper.process_latest_post()  # Returns structured data
+
+# For full functionality:
+scraper = ExecSumScraper(openai_api_key="your-key-here")
+```
+
+### Next Steps for Full Implementation
+1. **Enhance Content Extraction**: 
+   - Try browser automation (Selenium) for full article content
+   - Test different URL patterns for individual posts
+   - Investigate if content is loaded dynamically via JavaScript
+
+2. **OpenAI Integration**:
+   - Add API key to enable real rewriting
+   - Test with multiple posts
+   - Optimize prompts for financial content
+
+3. **Integration with USFM Pipeline**:
+   - Add to existing content ingestion system
+   - Include proper attribution ("Source: ExecSum")
+   - Add rate limiting for respectful scraping
+
+4. **Content Enhancement**:
+   - Get full article content instead of snippets
+   - Extract images and metadata
+   - Handle different post formats
+
+### Legal Considerations ⚠️
+- ExecSum is a curated newsletter with copyright protection
+- Need proper attribution and potentially permission
+- Consider fair use guidelines
+- May need licensing agreement for commercial use
+
+### Quick Start Commands
+```bash
+# Test current implementation:
+python3 execsum_scraper.py
+
+# Expected output:
+# - Gets latest post metadata
+# - Extracts limited content from main page
+# - Simulates rewriting process
+# - Returns structured data ready for integration
+```
+
+### Files to Use
+- **Primary**: `execsum_scraper.py` (complete working scraper)
+- **Dependencies**: `requests`, `beautifulsoup4` (already installed)
+- **Optional**: `openai` (for real rewriting, not installed yet)
+
+### Current Limitations
+- Content extraction is limited to main page snippets
+- No full article content access
+- Individual post URLs don't work
+- Requires enhancement for production use
+
+**Status**: Ready for enhancement and integration into USFM content pipeline

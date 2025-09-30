@@ -152,11 +152,35 @@ async function getSmartContent(): Promise<{ posts: Post[], sections: Section[], 
 export default async function HomePage() {
   const { posts, sections, smartContent } = await getSmartContent()
 
+  // Organization JSON-LD schema
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "US Finance Moves",
+    "url": "https://www.usfinancemoves.com",
+    "logo": "https://www.usfinancemoves.com/logo.png",
+    "description": "US Finance Deal Feed - M&A, LBO, take-privates, antitrust, major financings",
+    "sameAs": [
+      "https://twitter.com/usfinancemoves"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "url": "https://www.usfinancemoves.com/contact"
+    }
+  }
+
   const featuredPost = posts[0]
   const topHeadlines = posts.slice(1, 7) // Next 6 posts for top headlines
 
   return (
     <>
+      {/* Organization JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
+      
       <Header sections={sections} />
       
       <main className="main">

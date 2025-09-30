@@ -3,6 +3,7 @@ Content processing utilities for the news ingestor
 """
 import re
 import logging
+from datetime import datetime, timezone
 from typing import Dict, List, Optional
 from bs4 import BeautifulSoup
 from config import MAX_EXCERPT_WORDS
@@ -223,6 +224,19 @@ class ContentProcessor:
             elif 'doj' in source_name.lower() or 'ftc' in source_name.lower():
                 origin_type = 'USGOV'
             
+            # Handle timestamp - convert published_parsed to UTC if available
+            created_at = None
+            if item.get('published_parsed'):
+                if isinstance(item['published_parsed'], datetime):
+                    # Already a datetime object, ensure it's UTC
+                    created_at = item['published_parsed'].isoformat()
+                else:
+                    # Convert struct_time to UTC datetime
+                    created_at = datetime(*item['published_parsed'][:6], tzinfo=timezone.utc).isoformat()
+            else:
+                # Fallback to current time in UTC
+                created_at = datetime.now(timezone.utc).isoformat()
+
             # Create post data
             post_data = {
                 'title': title,
@@ -234,7 +248,8 @@ class ContentProcessor:
                 'tags': tags,
                 'status': 'published',
                 'origin_type': origin_type,
-                'image_url': image_url
+                'image_url': image_url,
+                'created_at': created_at
             }
             
             return post_data

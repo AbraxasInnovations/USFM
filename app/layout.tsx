@@ -18,6 +18,53 @@ const playfairDisplay = Playfair_Display({
 export const metadata: Metadata = {
   title: 'US Finance Moves',
   description: 'US Finance Deal Feed - M&A, LBO, take-privates, antitrust, major financings',
+  keywords: 'finance, M&A, LBO, private equity, deals, acquisitions, mergers, antitrust, financings',
+  authors: [{ name: 'USFM', url: 'https://derekpethel.com/press' }],
+  creator: 'US Finance Moves',
+  publisher: 'US Finance Moves',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://www.usfinancemoves.com'),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://www.usfinancemoves.com',
+    siteName: 'US Finance Moves',
+    title: 'US Finance Moves',
+    description: 'US Finance Deal Feed - M&A, LBO, take-privates, antitrust, major financings',
+    images: [
+      {
+        url: '/og-default.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'US Finance Moves',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'US Finance Moves',
+    description: 'US Finance Deal Feed - M&A, LBO, take-privates, antitrust, major financings',
+    images: ['/og-default.jpg'],
+    creator: '@usfinancemoves',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
@@ -38,6 +85,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Performance Optimizations */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        
         {/* Google AdSense */}
         <script
           async
