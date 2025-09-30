@@ -8,18 +8,19 @@ interface ArticlePageProps {
 }
 
 async function getArticle(slug: string) {
-  const { data: post, error } = await supabase
+  const { data: posts, error } = await supabase
     .from('posts')
     .select('*')
     .eq('article_slug', slug)
     .eq('status', 'published')
-    .single()
+    .order('created_at', { ascending: false })
 
-  if (error || !post) {
+  if (error || !posts || posts.length === 0) {
     return null
   }
 
-  return post
+  // Return the most recent article (first in the ordered list)
+  return posts[0]
 }
 
 async function getSections() {
