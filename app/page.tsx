@@ -91,6 +91,15 @@ async function getSmartContent(): Promise<{ posts: Post[], sections: Section[], 
         smartContent[sectionSlug] = availablePosts
       }
     }
+    
+    // Debug logging for LBO section
+    if (sectionSlug === 'lbo') {
+      console.log(`LBO section debug:`)
+      console.log(`  - Total posts: ${sortedPosts.length}`)
+      console.log(`  - Recent posts: ${recentPosts.length}`)
+      console.log(`  - Available posts: ${smartContent[sectionSlug]?.length || 0}`)
+      console.log(`  - Threshold: ${threshold}`)
+    }
   }
 
   // Create homepage posts with Bloomberg prioritization
