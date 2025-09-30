@@ -56,7 +56,9 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   return {
     title,
     description: description.length > 160 ? description.substring(0, 157) + '...' : description,
-    canonical: canonicalUrl,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title,
       description,
@@ -84,9 +86,6 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       description,
       images: [imageUrl],
       creator: '@usfinancemoves',
-    },
-    alternates: {
-      canonical: canonicalUrl,
     },
   }
 }
