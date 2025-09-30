@@ -73,10 +73,15 @@ class SECContentProcessor:
                         logger.info(f"Rewritten S-4 article already exists, skipping: {rewritten_data['title'][:50]}...")
                         continue
                     
-                    # Step 4.6: Check if we've already written about this company recently (within last 7 days)
+                    # Step 4.6: Check if we've already written about this company recently (within last 24 hours)
                     company_name = filing.get('company_name', '').lower().strip()
-                    if company_name and self._has_recent_company_article(company_name, days_back=7):
+                    if company_name and self._has_recent_company_article(company_name, days_back=1):
                         logger.info(f"Already wrote about {company_name} recently, skipping to avoid repetition")
+                        continue
+                    
+                    # Step 4.6.5: Additional check - look for articles with similar titles (more aggressive deduplication)
+                    if self._has_similar_article_recently(rewritten_data['title'], days_back=1):
+                        logger.info(f"Found similar article recently, skipping: {rewritten_data['title'][:50]}...")
                         continue
                     
                     # Step 4.7: Check if slug already exists (additional safety check)
@@ -229,6 +234,50 @@ class SECContentProcessor:
             logger.error(f"Error checking if slug exists: {e}")
             return False
 
+    def _has_similar_article_recently(self, title: str, days_back: int = 1) -> bool:
+        """
+        Check if we've already written an article with a similar title recently
+        This is more aggressive deduplication for SEC articles
+        """
+        try:
+            from datetime import datetime, timedelta
+            
+            # Calculate cutoff date
+            cutoff_date = datetime.now() - timedelta(days=days_back)
+            cutoff_date_str = cutoff_date.strftime('%Y-%m-%d')
+            
+            # Extract key company names from the title for comparison
+            title_lower = title.lower()
+            
+            # Look for articles with similar company names in the title
+            # This catches cases where the same companies are mentioned in different ways
+            result = self.db.supabase.table('posts').select('id, title').eq('origin_type', 'SCRAPED').gte('created_at', cutoff_date_str).execute()
+            
+            for article in result.data:
+                article_title_lower = article['title'].lower()
+                
+                # Check if both titles mention the same key companies
+                # Extract company names (words that are likely company names)
+                title_companies = set()
+                article_companies = set()
+                
+                # Simple heuristic: look for capitalized words that appear in both titles
+                import re
+                title_words = re.findall(r'\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b', title)
+                article_words = re.findall(r'\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b', article['title'])
+                
+                # If there's significant overlap in company names, consider it a duplicate
+                overlap = set(title_words) & set(article_words)
+                if len(overlap) >= 2:  # At least 2 company names overlap
+                    logger.info(f"Found similar article with overlapping companies: {overlap}")
+                    return True
+            
+            return False
+            
+        except Exception as e:
+            logger.error(f"Error checking for similar articles: {e}")
+            return False
+
     def _has_recent_company_article(self, company_name: str, days_back: int = 7) -> bool:
         """
         Check if we've already written about this company recently
@@ -240,15 +289,15 @@ class SECContentProcessor:
             cutoff_date = datetime.now() - timedelta(days=days_back)
             cutoff_date_str = cutoff_date.strftime('%Y-%m-%d')
             
-            # Search for recent articles about this company
-            # Look in title, summary, and company_name fields
-            result = self.db.supabase.table('posts').select('id').or_(
-                f"title.ilike.%{company_name}%,summary.ilike.%{company_name}%,company_name.ilike.%{company_name}%"
-            ).gte('created_at', cutoff_date_str).execute()
+            # Search for recent SEC articles about this company
+            # Look specifically in the company_name field for exact matches
+            result = self.db.supabase.table('posts').select('id, title, company_name').eq('origin_type', 'SCRAPED').eq('company_name', company_name).gte('created_at', cutoff_date_str).execute()
             
             has_recent = len(result.data) > 0
             if has_recent:
-                logger.info(f"Found {len(result.data)} recent articles about {company_name}")
+                logger.info(f"Found {len(result.data)} recent SEC articles about {company_name}")
+                for article in result.data:
+                    logger.info(f"  - {article['title'][:50]}...")
             
             return has_recent
             
